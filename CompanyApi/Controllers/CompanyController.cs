@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Linq;
 
 namespace CompanyApi.Controllers
@@ -14,17 +13,17 @@ namespace CompanyApi.Controllers
     private static readonly List<Company> companies = new ();
 
     [HttpPost]
-    public IActionResult AddNewCompany(Company company)
+    public IActionResult AddNewCompany(Company newCompany)
     {
-      if (!HasCompany(company))
+      if (companies.Any(company => company.Name.Equals(newCompany.Name)))
       {
-        companies.Add(company);
-
-        return Created($"/companies/{company.CompanyId}", company);
+        return Conflict();
       }
       else
       {
-        return Conflict();
+        companies.Add(newCompany);
+
+        return Created($"/companies/{newCompany.CompanyId}", newCompany);
       }
     }
 
@@ -155,21 +154,6 @@ namespace CompanyApi.Controllers
       companies.Clear();
 
       return NoContent();
-    }
-
-    private static bool HasCompany(Company newCompany)
-    {
-      var hasCompany = false;
-      foreach (var company in companies)
-      {
-        if (company.Name.Equals(newCompany.Name))
-        {
-          hasCompany = true;
-          break;
-        }
-      }
-
-      return hasCompany;
     }
   }
 }
