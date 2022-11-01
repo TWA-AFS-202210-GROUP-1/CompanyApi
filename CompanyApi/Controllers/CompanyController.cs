@@ -14,17 +14,17 @@ namespace CompanyApi.Controllers
     private static readonly List<Company> companies = new ();
 
     [HttpPost]
-    public ActionResult<Company> AddNewCompany(Company company)
+    public IActionResult AddNewCompany(Company company)
     {
       if (!HasCompany(company))
       {
         companies.Add(company);
 
-        return new CreatedResult($"/companies/{company.CompanyId}", company);
+        return Created($"/companies/{company.CompanyId}", company);
       }
       else
       {
-        return new ConflictResult();
+        return Conflict();
       }
     }
 
@@ -68,6 +68,21 @@ namespace CompanyApi.Controllers
         var returnedCompany = companies.First(company => company.CompanyId.Equals(companyId));
 
         return Ok(returnedCompany);
+      }
+      catch (Exception e)
+      {
+        return NotFound(e.Message);
+      }
+    }
+
+    [HttpGet("{companyId}/Employees")]
+    public IActionResult GetEmployees([FromRoute] string companyId)
+    {
+      try
+      {
+        var returnedCompany = companies.First(company => company.CompanyId.Equals(companyId));
+
+        return Ok(returnedCompany.Employees);
       }
       catch (Exception e)
       {

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 
 namespace CompanyApi.Model
 {
@@ -21,6 +20,11 @@ namespace CompanyApi.Model
       return obj is Employee employee
              && Name.Equals(employee.Name)
              && Salary.Equals(employee.Salary);
+    }
+
+    public override int GetHashCode()
+    {
+      throw new NotImplementedException();
     }
   }
 }
