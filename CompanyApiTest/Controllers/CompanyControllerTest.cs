@@ -241,6 +241,44 @@ namespace CompanyApiTest.Controllers
             Assert.Equal(newEmployee.EmployeeId, fetchEmployee.EmployeeId);
         }
 
+        [Fact]
+        public async void Should_get_all_employee_list_Given_a_company_id()
+        {
+            //given
+            var application = new WebApplicationFactory<Program>();
+            var httpClient = application.CreateClient();
+            _ = httpClient.DeleteAsync("/companies");
+
+            var companyNameList = new List<string>()
+            {
+                "Umbrella",
+                "Tencent",
+                "Sony",
+                "Nintendo",
+                "Valve",
+                "Rockstar",
+                "Electronic Arts",
+                "Activision Blizzard",
+                "Ubisoft",
+            };
+            List<Company> companyList = await AddMultiCompaniesToBackend(httpClient, companyNameList);
+            _ = httpClient.DeleteAsync("/companies/employee");
+
+            Employee newEmployee = new Employee();
+            List<Employee> exceptedEmployeeList = new List<Employee>() { newEmployee };
+            var newEmployeeJson = JsonConvert.SerializeObject(newEmployee);
+            var postBody = new StringContent(newEmployeeJson, Encoding.UTF8, "application/json");
+            await httpClient.PostAsync($"/companies/{companyList[0].CompanyId}/employee", postBody);
+
+            //when
+            var response = await httpClient.GetAsync($"/companies/{companyList[0].CompanyId}/employee");
+            // then
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var responseBody = await response.Content.ReadAsStringAsync();
+            var fetchEmployeeList = JsonConvert.DeserializeObject<List<Employee>>(responseBody);
+            fetchEmployeeList.ShouldDeepEqual(exceptedEmployeeList);
+        }
+
         private static async Task<List<Company>> AddMultiCompaniesToBackend(HttpClient httpClient, List<string> companyNameList)
         {
             List<Company> companyList = new List<Company>();

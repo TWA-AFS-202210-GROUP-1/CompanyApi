@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 
 namespace CompanyApi.Controllers
 {
@@ -30,6 +31,12 @@ namespace CompanyApi.Controllers
         public void ClearCompaniesList()
         {
             companiesList.Clear();
+        }
+
+        [HttpDelete("companies/employee")]
+        public void ClearEmployeeList()
+        {
+            companiesList.ForEach(x => x.EmployeeList.Clear());
         }
 
         [HttpGet("companies")]
@@ -77,6 +84,19 @@ namespace CompanyApi.Controllers
             {
                 companiesList.Find(x => x.CompanyId.Equals(companyId)).EmployeeList.Add(employee);
                 return Ok(employee);
+            }
+            else
+            {
+                return new NotFoundResult();
+            }
+        }
+
+        [HttpGet("companies/{companyId}/employee")]
+        public ActionResult<List<Employee>> GetALlEmployeeForOneCompany([FromRoute] string companyId)
+        {
+            if (companiesList.Exists(x => x.CompanyId.Equals(companyId)))
+            {
+                return companiesList.Find(x => x.CompanyId.Equals(companyId)).EmployeeList;
             }
             else
             {
