@@ -33,8 +33,13 @@ namespace CompanyApi.Controllers
         }
 
         [HttpGet("companies")]
-        public ActionResult<List<Company>> GetAllCompanyList()
+        public ActionResult<List<Company>> GetAllCompanyList([FromQuery] int? pageSize, [FromQuery] int? pageIndex)
         {
+            if (pageSize != null && pageIndex != null)
+            {
+                return companiesList.GetRange((int)(pageSize * (pageIndex - 1)), (int)((pageSize * pageIndex) - 1));
+            }
+
             return Ok(companiesList);
         }
 

@@ -137,6 +137,40 @@ namespace CompanyApiTest.Controllers
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
+        [Fact]
+        public async void Should_return_compantList_Given_pageSize_and_page_index()
+        {
+            //given
+            var application = new WebApplicationFactory<Program>();
+            var httpClient = application.CreateClient();
+            _ = httpClient.DeleteAsync("/companies");
+
+            var companyNameList = new List<string>()
+            {
+                "Umbrella",
+                "Tencent",
+                "Sony",
+                "Nintendo",
+                "Valve",
+                "Rockstar",
+                "Electronic Arts",
+                "Activision Blizzard",
+                "Ubisoft",
+            };
+            List<Company> companyList = await AddMultiCompaniesToBackend(httpClient, companyNameList);
+            int pageSize = 3;
+            int pageIndex = 2;
+
+            //when
+            var response = await httpClient.GetAsync($"/companies?pageSize={pageSize}&pageIndex={pageIndex}");
+
+            // then
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var responseBody = await response.Content.ReadAsStringAsync();
+            var fetchCompanyList = JsonConvert.DeserializeObject<List<Company>>(responseBody);
+            fetchCompanyList.ShouldDeepEqual(companyList.GetRange(0, 2));
+        }
+
         private static async Task<List<Company>> AddMultiCompaniesToBackend(HttpClient httpClient, List<string> companyNameList)
         {
             List<Company> companyList = new List<Company>();
