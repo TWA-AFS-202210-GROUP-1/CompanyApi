@@ -81,8 +81,14 @@ namespace CompanyApi.Controllers
       try
       {
         var returnedCompany = companies.First(company => company.CompanyId.Equals(companyId));
-
-        return Ok(returnedCompany.Employees);
+        if (returnedCompany.Employees.Count > 0)
+        {
+          return Ok(returnedCompany.Employees);
+        }
+        else
+        {
+          return NotFound();
+        }
       }
       catch (Exception e)
       {
@@ -107,7 +113,7 @@ namespace CompanyApi.Controllers
     }
 
     [HttpPut("{companyId}/employees/{employeeId}")]
-    public IActionResult UpdateCompanyInformation([FromRoute] string companyId, [FromRoute] string employeeId, Employee updatedEmployee)
+    public IActionResult UpdateEmployeeInformation([FromRoute] string companyId, [FromRoute] string employeeId, Employee updatedEmployee)
     {
       try
       {
@@ -122,6 +128,16 @@ namespace CompanyApi.Controllers
       {
         return NotFound(e.Message);
       }
+    }
+
+    [HttpDelete("{companyId}/employees/{employeeId}")]
+    public IActionResult DeleteCompanyById([FromRoute] string companyId, [FromRoute] string employeeId)
+    {
+      var returnedCompany = companies.First(company => company.CompanyId.Equals(companyId));
+      var returnedEmployee = returnedCompany.Employees.First(employee => employee.EmployeeId.Equals(employeeId));
+      returnedCompany.Employees.Remove(returnedEmployee);
+
+      return NoContent();
     }
 
     [HttpDelete]
