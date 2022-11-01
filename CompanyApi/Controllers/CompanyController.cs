@@ -26,7 +26,7 @@ namespace CompanyApi.Controllers
             return new CreatedResult($"/companies/{company.CompanyID}", company);
         }
 
-        [HttpDelete("deleteAllCompnies")]
+        [HttpDelete]
         public void DeleteAllCompanies()
         {
             companies.Clear();
@@ -36,6 +36,18 @@ namespace CompanyApi.Controllers
         public ActionResult<List<Company>> GetAllCompanies()
         {
             return Ok(companies);
+        }
+
+        [HttpGet("{companyID}")]
+        public ActionResult<Company> GetCompanyByID([FromRoute] string companyID)
+        {
+            Company company = companies.Find(x => x.CompanyID == companyID);
+            if (company == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(company);
         }
     }
 }

@@ -26,7 +26,7 @@ namespace CompanyApiTest.Controllers
             // given
             var application = new WebApplicationFactory<Program>();
             var httpClient = application.CreateClient();
-            await httpClient.DeleteAsync("/companies/deleteAllCompnies");
+            await httpClient.DeleteAsync("/companies");
             var company = new Company(name: "SLB");
             var companyJson = JsonConvert.SerializeObject(company);
             var postBody = new StringContent(companyJson, Encoding.UTF8, mediaType: "application/json");
@@ -47,7 +47,7 @@ namespace CompanyApiTest.Controllers
             // given
             var application = new WebApplicationFactory<Program>();
             var httpClient = application.CreateClient();
-            await httpClient.DeleteAsync("/companies/deleteAllCompnies");
+            await httpClient.DeleteAsync("/companies");
             var company = new Company(name: "SLB");
             var companyJson = JsonConvert.SerializeObject(company);
             var postBody = new StringContent(companyJson, Encoding.UTF8, mediaType: "application/json");
@@ -65,7 +65,7 @@ namespace CompanyApiTest.Controllers
             List<Company> companies = new List<Company>() { new Company(name: "SLB"), new Company(name: "Apple") };
             var application = new WebApplicationFactory<Program>();
             var httpClient = application.CreateClient();
-            await httpClient.DeleteAsync("/companies/deleteAllCompnies");
+            await httpClient.DeleteAsync("/companies");
             foreach (var company in companies)
             {
                 var companyJson = JsonConvert.SerializeObject(company);
@@ -80,6 +80,34 @@ namespace CompanyApiTest.Controllers
             var responseBody = await response.Content.ReadAsStringAsync();
             var allCompanies = JsonConvert.DeserializeObject<List<Company>>(responseBody);
             Assert.Equal(2, allCompanies.Count);
+        }
+
+        [Fact]
+        public async Task Should_return_copany_successfully_given_company_Id()
+        {
+            // given
+            List<Company> companies = new List<Company>() { new Company(name: "SLB"), new Company(name: "Apple") };
+            var application = new WebApplicationFactory<Program>();
+            var httpClient = application.CreateClient();
+            await httpClient.DeleteAsync("/companies");
+            var targetId = string.Empty;
+            foreach (var company in companies)
+            {
+                var companyJson = JsonConvert.SerializeObject(company);
+                var postBody = new StringContent(companyJson, Encoding.UTF8, mediaType: "application/json");
+                var response = await httpClient.PostAsync("/companies", postBody);
+                var responseBody = await response.Content.ReadAsStringAsync();
+                var responseCompany = JsonConvert.DeserializeObject<Company>(responseBody);
+                targetId = responseCompany.CompanyID;
+            }
+
+            // when
+            var targetResponse = await httpClient.GetAsync($"/companies/{targetId}");
+            // then
+            Assert.Equal(HttpStatusCode.OK, targetResponse.StatusCode);
+            var targetResponseBody = await targetResponse.Content.ReadAsStringAsync();
+            var targetCompany = JsonConvert.DeserializeObject<Company>(targetResponseBody);
+            Assert.Equal("Apple", targetCompany.Name);
         }
     }
 }
