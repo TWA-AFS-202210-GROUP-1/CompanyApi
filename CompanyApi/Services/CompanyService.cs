@@ -49,6 +49,19 @@ namespace CompanyApi.Services
             return updatingCompany;
         }
 
+        public bool DeleteCompany(string id)
+        {
+            var company = Companies.FirstOrDefault(_ => _.Id!.Equals(id));
+            if (company != null)
+            {
+                Companies.Remove(company);
+                return true;
+            }
+
+            return false;
+
+        }
+
         public Employee AddEmployeeToCompany(string companyId, Employee employee)
         {
             var company = Companies.FirstOrDefault(_ => _.Id!.Equals(companyId));

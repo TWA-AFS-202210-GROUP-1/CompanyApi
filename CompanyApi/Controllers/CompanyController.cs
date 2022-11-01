@@ -74,10 +74,22 @@ namespace CompanyApi.Controllers
             var updatedCompany = _companyService.UpdateCompany(id, info);
             if (updatedCompany == null)
             {
-                return NoContent();
+                return NotFound();
             }
 
             return Ok(updatedCompany);
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteCompany([FromRoute] string id)
+        {
+            var isDeleteCompany = _companyService.DeleteCompany(id);
+            if (isDeleteCompany)
+            {
+                return NoContent();
+            }
+
+            return NotFound();
         }
 
         [HttpPost("{companyId}/employees")]

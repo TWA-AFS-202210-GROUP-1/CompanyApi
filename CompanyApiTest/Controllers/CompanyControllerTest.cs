@@ -245,5 +245,31 @@ namespace CompanyApiTest.Controllers
             Assert.Equal(HttpStatusCode.NoContent, deleteEmployeeResponse.StatusCode);
             Assert.Equal(HttpStatusCode.NotFound, reGetDeletedEmployeeResponse.StatusCode);
         }
+
+        [Fact]
+        public async Task Should_return_no_content_when_delete_company_successfully_given_an_existed_id()
+        {
+            // given
+            var company = new Company("SLB");
+            var companyResponse = await _httpClient.PostAsJsonAsync("/companies", company);
+            var companyResponseString = await companyResponse.Content.ReadAsStringAsync();
+            var createdCompany = JsonConvert.DeserializeObject<Company>(companyResponseString);
+            var companyId = createdCompany.Id;
+            var employee = new Employee("Xu", 100);
+            var createdEmployeeResponse = await _httpClient.PostAsJsonAsync($"/companies/{companyId}/employees", employee);
+            var createdEmployeeResponseString = await createdEmployeeResponse.Content.ReadAsStringAsync();
+            var createdEmployee = JsonConvert.DeserializeObject<Employee>(createdEmployeeResponseString);
+            // when
+
+            var deleteEmployeeResponse = await _httpClient.DeleteAsync($"/companies/{companyId}");
+            var reGetDeletedCompanyResponse = await _httpClient.GetAsync($"/companies/{companyId}");
+            var reGetEmployeeInDeletedCompanyResponse = await _httpClient.GetAsync($"/companies/{companyId}/employees/{createdEmployee.Id}");
+
+            // then
+            deleteEmployeeResponse.EnsureSuccessStatusCode();
+            Assert.Equal(HttpStatusCode.NoContent, deleteEmployeeResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.NotFound, reGetDeletedCompanyResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.NotFound, reGetEmployeeInDeletedCompanyResponse.StatusCode);
+        }
     }
 }
