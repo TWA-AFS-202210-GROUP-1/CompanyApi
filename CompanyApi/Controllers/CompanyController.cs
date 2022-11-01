@@ -31,5 +31,24 @@ namespace CompanyApi.Controllers
         {
             companiesList.Clear();
         }
+
+        [HttpGet("companies")]
+        public ActionResult<List<Company>> GetAllCompanyList()
+        {
+            return Ok(companiesList);
+        }
+
+        [HttpGet("companies/{companyId}")]
+        public ActionResult<Company> GetOneCompanyByID([FromRoute] string companyId)
+        {
+            if (companiesList.Exists(x => x.CompanyId.Equals(companyId)))
+            {
+                return Ok(companiesList.Find(x => x.CompanyId.Equals(companyId)));
+            }
+            else
+            {
+                return new NotFoundResult();
+            }
+        }
     }
 }
