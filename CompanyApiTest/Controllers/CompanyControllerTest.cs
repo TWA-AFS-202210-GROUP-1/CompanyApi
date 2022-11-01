@@ -206,6 +206,41 @@ namespace CompanyApiTest.Controllers
             Assert.Equal(newCompany.CompanyName, fetchCompany.CompanyName);
         }
 
+        [Fact]
+        public async void Should_add_employee_to_employee_list_Given_a_employee()
+        {
+            //given
+            var application = new WebApplicationFactory<Program>();
+            var httpClient = application.CreateClient();
+            _ = httpClient.DeleteAsync("/companies");
+
+            var companyNameList = new List<string>()
+            {
+                "Umbrella",
+                "Tencent",
+                "Sony",
+                "Nintendo",
+                "Valve",
+                "Rockstar",
+                "Electronic Arts",
+                "Activision Blizzard",
+                "Ubisoft",
+            };
+            List<Company> companyList = await AddMultiCompaniesToBackend(httpClient, companyNameList);
+            Employee newEmployee = new Employee();
+            var newEmployeeJson = JsonConvert.SerializeObject(newEmployee);
+            var postBody = new StringContent(newEmployeeJson, Encoding.UTF8, "application/json");
+
+            //when
+            var response = await httpClient.PostAsync($"/companies/{companyList[0].CompanyId}/employee", postBody);
+
+            // then
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var responseBody = await response.Content.ReadAsStringAsync();
+            var fetchEmployee = JsonConvert.DeserializeObject<Employee>(responseBody);
+            Assert.Equal(newEmployee.EmployeeId, fetchEmployee.EmployeeId);
+        }
+
         private static async Task<List<Company>> AddMultiCompaniesToBackend(HttpClient httpClient, List<string> companyNameList)
         {
             List<Company> companyList = new List<Company>();

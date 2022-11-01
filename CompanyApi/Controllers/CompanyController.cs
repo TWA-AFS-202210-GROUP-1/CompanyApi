@@ -69,5 +69,19 @@ namespace CompanyApi.Controllers
                 return new NotFoundResult();
             }
         }
+
+        [HttpPost("companies/{companyId}/employee")]
+        public ActionResult<Employee> AddEmployeeToCompany([FromBody] Employee employee, [FromRoute] string companyId)
+        {
+            if (companiesList.Exists(x => x.CompanyId.Equals(companyId)))
+            {
+                companiesList.Find(x => x.CompanyId.Equals(companyId)).EmployeeList.Add(employee);
+                return Ok(employee);
+            }
+            else
+            {
+                return new NotFoundResult();
+            }
+        }
     }
 }

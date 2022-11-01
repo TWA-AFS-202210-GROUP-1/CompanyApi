@@ -1,4 +1,6 @@
-﻿namespace CompanyApi.Model
+﻿using System.Collections.Generic;
+
+namespace CompanyApi.Model
 {
     public class Company
     {
@@ -6,6 +8,7 @@
         {
             this.CompanyName = companyName;
             this.CompanyId = " ";
+            EmployeeList = new List<Employee>();
         }
 
         public string CompanyName
@@ -14,6 +17,11 @@
         }
 
         public string CompanyId
+        {
+            get; set;
+        }
+
+        public List<Employee> EmployeeList
         {
             get; set;
         }
