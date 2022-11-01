@@ -117,5 +117,33 @@ namespace CompanyApi.Controllers
                 return new NotFoundResult();
             }
         }
+
+        [HttpDelete("companies/{companyId}/employee/{employeeId}")]
+        public ActionResult DeleteOneEmployeeInOneCompany([FromRoute] string companyId, [FromRoute] string employeeId)
+        {
+            if (companiesList.Exists(x => x.CompanyId.Equals(companyId)) && companiesList.Find(x => x.CompanyId.Equals(companyId)).EmployeeList.Exists(e => e.EmployeeId.Equals(employeeId)))
+            {
+                companiesList.Find(x => x.CompanyId.Equals(companyId)).EmployeeList.Remove(companiesList.Find(x => x.CompanyId.Equals(companyId)).EmployeeList.Find(e => e.EmployeeId.Equals(employeeId)));
+                return Ok();
+            }
+            else
+            {
+                return new NotFoundResult();
+            }
+        }
+
+        [HttpGet("companies/{companyId}/employee/{employeeId}")]
+        public ActionResult<Employee> GetOneEmployeeInOneCompany([FromRoute] string companyId, [FromRoute] string employeeId)
+        {
+            if (companiesList.Exists(x => x.CompanyId.Equals(companyId)) && companiesList.Find(x => x.CompanyId.Equals(companyId)).EmployeeList.Exists(e => e.EmployeeId.Equals(employeeId)))
+            {
+                companiesList.Find(x => x.CompanyId.Equals(companyId)).EmployeeList.Remove(companiesList.Find(x => x.CompanyId.Equals(companyId)).EmployeeList.Find(e => e.EmployeeId.Equals(employeeId)));
+                return Ok(companiesList.Find(x => x.CompanyId.Equals(companyId)).EmployeeList.Find(e => e.EmployeeId.Equals(employeeId)));
+            }
+            else
+            {
+                return new NotFoundResult();
+            }
+        }
     }
 }
