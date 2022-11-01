@@ -16,5 +16,11 @@ namespace CompanyApi.Controllers
             companys.Add(company);
             return new CreatedResult("/companies/{company.CompanyID}", company);
         }
+
+        [HttpGet("companys")]
+        public ActionResult<List<Company>> GetAllCompanys()
+        {
+            return companys;
+        }
     }
 }
