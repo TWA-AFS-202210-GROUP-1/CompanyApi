@@ -23,7 +23,21 @@ namespace CompanyApi.Controllers
             return companys;
         }
 
-        [HttpGet("companys/{companyname}")]
+        [HttpGet("companys/{companyID}")]
+        public ActionResult<Company> GetCompanybyName(string companyID)
+        {
+            foreach (var company in companys)
+            {
+                if (company.CompanyID == companyID)
+                {
+                    return company;
+                }
+            }
+
+            return NotFound();
+        }
+
+        [HttpGet("companys/size/{size}/from/{aa}")]
         public ActionResult<Company> GetAllCompanys(string companyname)
         {
             foreach (var company in companys)
