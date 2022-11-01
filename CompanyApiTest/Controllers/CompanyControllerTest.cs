@@ -144,5 +144,27 @@ namespace CompanyApiTest.Controllers
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Equal("SLB-2", companyResponse.Name);
         }
+
+        [Fact]
+        public async Task Should_create_employee_for_company_when_create_successfully_given_a_employee_and_an_exist_company()
+        {
+            // given
+            var company = new Company("SLB");
+            var companyResponse = await _httpClient.PostAsJsonAsync("/companies", company);
+            var companyResponseString = await companyResponse.Content.ReadAsStringAsync();
+            var createdCompany = JsonConvert.DeserializeObject<Company>(companyResponseString);
+            var companyId = createdCompany.Id;
+            var employee = new Employee("Xu", 100);
+            // when
+
+            var employeeResponse = await _httpClient.PostAsJsonAsync($"/companies/{companyId}/employees", employee);
+            var employeeResponseString = await companyResponse.Content.ReadAsStringAsync();
+            var createdEmployee = JsonConvert.DeserializeObject<Company>(employeeResponseString);
+
+            // then
+            employeeResponse.EnsureSuccessStatusCode();
+            Assert.Equal(HttpStatusCode.Created, employeeResponse.StatusCode);
+            Assert.NotNull(createdEmployee.Id);
+        }
     }
 }

@@ -8,7 +8,7 @@ namespace CompanyApi.Services
 {
     public class CompanyService : ICompanyService
     {
-        public List<Company> Companies { get; set; }
+        public IList<Company> Companies { get; set; }
 
         public CompanyService()
         {
@@ -47,6 +47,18 @@ namespace CompanyApi.Services
             }
 
             return updatingCompany;
+        }
+
+        public Employee AddEmployeeToCompany(string companyId, Employee employee)
+        {
+            var company = Companies.FirstOrDefault(_ => _.Id!.Equals(companyId));
+            if (company != null)
+            {
+                employee.Id = Guid.NewGuid().ToString();
+                company.Employees.Add(employee);
+            }
+
+            return employee;
         }
 
         public IList<Company> GetAllCompanies()

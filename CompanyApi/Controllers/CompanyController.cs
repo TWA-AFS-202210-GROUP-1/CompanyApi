@@ -79,5 +79,17 @@ namespace CompanyApi.Controllers
 
             return Ok(updatedCompany);
         }
+
+        [HttpPost("{companyId}/employees")]
+        public IActionResult AddEmployeeToCompany([FromRoute] string companyId, [FromBody] Employee employee)
+        {
+            var newEmployee = _companyService.AddEmployeeToCompany(companyId, employee);
+            if (string.IsNullOrEmpty(newEmployee.Id))
+            {
+                return NotFound();
+            }
+
+            return Created($"companies/{companyId}/employees/{newEmployee.Id}", newEmployee);
+        }
     }
 }

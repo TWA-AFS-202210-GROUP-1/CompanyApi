@@ -12,4 +12,5 @@ public interface ICompanyService
     public void DeleteAllCompany();
     public IList<Company> GetCompaniesByPage(int pageSize, int index);
     public Company? UpdateCompany(string id, CompanyUpdateDto updateInfo);
+    public Employee AddEmployeeToCompany(string companyId, Employee employee);
 }
