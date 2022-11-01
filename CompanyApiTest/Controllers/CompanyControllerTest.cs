@@ -113,6 +113,31 @@ namespace CompanyApiTest.Controllers
             savedCompany.ShouldDeepEqual(companyList[0]);
         }
 
+        [Fact]
+        public async void Should_return_NotFound_when_get_one_company_with_invalid_id()
+        {
+            //given
+            var application = new WebApplicationFactory<Program>();
+            var httpClient = application.CreateClient();
+            _ = httpClient.DeleteAsync("/companies");
+
+            var companyNameList = new List<string>()
+            {
+                "Umbrella",
+                "Tencent",
+                "Sony",
+            };
+            List<Company> companyList = await AddMultiCompaniesToBackend(httpClient, companyNameList);
+            string needToFindCompanyId = "invalid Id";
+
+            //when
+            var response = await httpClient.GetAsync($"/companies/{needToFindCompanyId}");
+
+            // then
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+
+        }
+
         private static async Task<List<Company>> AddMultiCompaniesToBackend(HttpClient httpClient, List<string> companyNameList)
         {
             List<Company> companyList = new List<Company>();
