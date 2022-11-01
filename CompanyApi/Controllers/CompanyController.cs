@@ -29,17 +29,28 @@ namespace CompanyApi.Controllers
     }
 
     [HttpGet]
-    public IActionResult GetAllCompanies()
+    public IActionResult GetAllCompanies([FromQuery] int? pageSize, [FromQuery] int? pageIndex)
     {
-      return Ok(companies);
+      if (pageSize != null && pageIndex != null)
+      {
+        var queriedCompanies = companies
+          .Skip((pageIndex.Value - 1) * pageSize.Value)
+          .Take(pageSize.Value)
+          .ToList();
+        return Ok(queriedCompanies);
+      }
+      else
+      {
+        return Ok(companies);
+      }
     }
 
-    [HttpGet("{id}")]
-    public IActionResult GetAllCompanies([FromRoute] string id)
+    [HttpGet("{companyId}")]
+    public IActionResult GetCompanyById([FromRoute] string companyId)
     {
       try
       {
-        var returnedCompany = companies.First(company => company.CompanyId.Equals(id));
+        var returnedCompany = companies.First(company => company.CompanyId.Equals(companyId));
 
         return Ok(returnedCompany);
       }

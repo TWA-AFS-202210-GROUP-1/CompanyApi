@@ -103,6 +103,36 @@ namespace CompanyApiTest.Controllers
       Assert.Equal(companies[0].Name, returnedCompany.Name);
     }
 
+    [Fact]
+    public async void Should_get_3_companies_from_page_2()
+    {
+      // given
+      var httpClient = await InitializeHttpClient();
+      var companies = new List<Company>
+      {
+        new Company("SLB"),
+        new Company("TW"),
+        new Company("Baidu"),
+        new Company("Tencent"),
+        new Company("Microsoft"),
+        new Company("MacroHard"),
+        new Company("Vestas"),
+        new Company("Siemens"),
+      };
+      foreach (var company in companies)
+      {
+        await CreateTestSubject(httpClient, company);
+      }
+
+      // when
+      var response = await httpClient.GetAsync($"/companies?pageSize=3&pageIndex=2");
+      // then
+      Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+      var responseBody = await response.Content.ReadAsStringAsync();
+      var returnedCompanies = JsonConvert.DeserializeObject<List<Company>>(responseBody);
+      Assert.Equal(3, returnedCompanies.Count);
+    }
+
     private static async Task<HttpClient> InitializeHttpClient()
     {
       var application = new WebApplicationFactory<Program>();
