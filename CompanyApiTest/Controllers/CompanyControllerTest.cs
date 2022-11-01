@@ -127,7 +127,7 @@ namespace CompanyApiTest.Controllers
                 "Tencent",
                 "Sony",
             };
-            List<Company> companyList = await AddMultiCompaniesToBackend(httpClient, companyNameList);
+            await AddMultiCompaniesToBackend(httpClient, companyNameList);
             string needToFindCompanyId = "invalid Id";
 
             //when
@@ -135,7 +135,6 @@ namespace CompanyApiTest.Controllers
 
             // then
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-
         }
 
         private static async Task<List<Company>> AddMultiCompaniesToBackend(HttpClient httpClient, List<string> companyNameList)
