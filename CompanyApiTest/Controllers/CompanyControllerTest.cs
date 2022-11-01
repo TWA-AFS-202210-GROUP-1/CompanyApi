@@ -281,5 +281,50 @@ namespace CompanyApi.Controllers
             Assert.Equal("Tom", createdEmployee[0].Name);
             Assert.Equal("Jerry", createdEmployee[1].Name);
         }
+
+        [Fact]
+        public async Task Should_update_a_employee_from_a_company()
+        {
+            // given
+            var application = new WebApplicationFactory<Program>();
+            var httpClient = application.CreateClient();
+            /*
+             * Method: POST
+             * URI: /opi/addNewPet
+             * Body:
+             * {
+             *  "name: "Kitty",
+             *  "type":"cat",
+             *  "color":"white",
+             *  "price": 1000
+             * }
+             */
+            var company = new Company(name: "ABC");
+            var companyJSON = JsonConvert.SerializeObject(company);
+            var postBody = new StringContent(companyJSON, Encoding.UTF8, "application/json");
+            var response = await httpClient.PostAsync("/api/companys", postBody);
+            var responseBody = await response.Content.ReadAsStringAsync();
+            var createdCompany = JsonConvert.DeserializeObject<Company>(responseBody);
+            var id = createdCompany.CompanyID;
+            // when
+            var employee = new Employee(name: "Tom");
+            var employeeJSON = JsonConvert.SerializeObject(employee);
+            postBody = new StringContent(employeeJSON, Encoding.UTF8, "application/json");
+            response = await httpClient.PostAsync($"/api/companys/{id}/employees", postBody);
+            responseBody = await response.Content.ReadAsStringAsync();
+            var createdEmployee = JsonConvert.DeserializeObject<Employee>(responseBody);
+            var employeeid = createdEmployee.EmployeeID;
+            employee = new Employee(name: "Jerry", employeeid: employeeid);
+            employeeJSON = JsonConvert.SerializeObject(employee);
+            postBody = new StringContent(employeeJSON, Encoding.UTF8, "application/json");
+            response = await httpClient.PutAsync($"/api/companys/{id}/employees", postBody);
+
+            // then
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            responseBody = await response.Content.ReadAsStringAsync();
+            createdEmployee = JsonConvert.DeserializeObject<Employee>(responseBody);
+
+            Assert.Equal("Jerry", createdEmployee.Name);
+        }
     }
 }

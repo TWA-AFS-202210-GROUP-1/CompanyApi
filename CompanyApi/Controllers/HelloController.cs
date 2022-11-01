@@ -88,5 +88,26 @@ namespace CompanyApi.Controllers
 
             return NotFound();
         }
+
+        [HttpPut("companys/{companyid}/employees")]
+        public ActionResult<Employee> Updateemployee([FromRoute] string companyid, Employee employee)
+        {
+            foreach (var existedcompany in companys)
+            {
+                if (existedcompany.CompanyID == companyid)
+                {
+                    foreach (var theemployee in existedcompany.Employees)
+                    {
+                        if (theemployee.EmployeeID == employee.EmployeeID)
+                        {
+                            theemployee.Name = employee.Name;
+                            return theemployee;
+                        }
+                    }
+                }
+            }
+
+            return NotFound();
+        }
     }
 }
