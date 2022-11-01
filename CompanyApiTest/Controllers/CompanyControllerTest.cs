@@ -80,7 +80,7 @@ namespace CompanyApiTest.Controllers
     }
 
     [Fact]
-    public async void Should_get_company_by_name_from_system()
+    public async void Should_get_company_by_id_from_system()
     {
       // given
       var httpClient = await InitializeHttpClient();
@@ -104,7 +104,7 @@ namespace CompanyApiTest.Controllers
     }
 
     [Fact]
-    public async void Should_get_3_companies_from_page_2()
+    public async void Should_get_2_companies_from_page_3()
     {
       // given
       var httpClient = await InitializeHttpClient();
@@ -125,12 +125,40 @@ namespace CompanyApiTest.Controllers
       }
 
       // when
-      var response = await httpClient.GetAsync($"/companies?pageSize=3&pageIndex=2");
+      var response = await httpClient.GetAsync("/companies?pageSize=3&pageIndex=3");
       // then
       Assert.Equal(HttpStatusCode.OK, response.StatusCode);
       var responseBody = await response.Content.ReadAsStringAsync();
       var returnedCompanies = JsonConvert.DeserializeObject<List<Company>>(responseBody);
-      Assert.Equal(3, returnedCompanies.Count);
+      Assert.Equal(2, returnedCompanies.Count);
+    }
+
+    [Fact]
+    public async void Should_update_company_name_from_system()
+    {
+      // given
+      var httpClient = await InitializeHttpClient();
+      var companies = new List<Company>
+      {
+        new Company("SLB"),
+        new Company("TW"),
+      };
+      foreach (var company in companies)
+      {
+        await CreateTestSubject(httpClient, company);
+      }
+
+      companies[0].Name = "Baidu";
+      var serializedObject = JsonConvert.SerializeObject(companies[0]);
+      var postBody = new StringContent(serializedObject, Encoding.UTF8, "application/json");
+
+      // when
+      var response = await httpClient.PutAsync($"/companies/{companies[0].CompanyId}", postBody);
+      // then
+      Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+      var responseBody = await response.Content.ReadAsStringAsync();
+      var returnedCompany = JsonConvert.DeserializeObject<Company>(responseBody);
+      Assert.Equal("Baidu", returnedCompany.Name);
     }
 
     private static async Task<HttpClient> InitializeHttpClient()

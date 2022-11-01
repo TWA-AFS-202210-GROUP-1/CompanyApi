@@ -29,14 +29,20 @@ namespace CompanyApi.Controllers
     }
 
     [HttpGet]
-    public IActionResult GetAllCompanies([FromQuery] int? pageSize, [FromQuery] int? pageIndex)
+    public IActionResult GetCompanies([FromQuery] int? pageSize, [FromQuery] int? pageIndex)
     {
+      if (companies.Count.Equals(0))
+      {
+        return NotFound();
+      }
+
       if (pageSize != null && pageIndex != null)
       {
         var queriedCompanies = companies
           .Skip((pageIndex.Value - 1) * pageSize.Value)
           .Take(pageSize.Value)
           .ToList();
+
         return Ok(queriedCompanies);
       }
       else
@@ -51,6 +57,22 @@ namespace CompanyApi.Controllers
       try
       {
         var returnedCompany = companies.First(company => company.CompanyId.Equals(companyId));
+
+        return Ok(returnedCompany);
+      }
+      catch (Exception e)
+      {
+        return NotFound(e.Message);
+      }
+    }
+
+    [HttpPut("{companyId}")]
+    public IActionResult UpdateCompanyInformation([FromRoute] string companyId, Company updatedCompany)
+    {
+      try
+      {
+        var returnedCompany = companies.First(company => company.CompanyId.Equals(companyId));
+        returnedCompany.Name = updatedCompany.Name;
 
         return Ok(returnedCompany);
       }
