@@ -25,5 +25,12 @@ namespace CompanyApi.Controllers
 
             return Created($"companies/{newCompany.Id}", newCompany);
         }
+
+        [HttpGet]
+        public IActionResult GetAllCompanies()
+        {
+            var companies = _companyService.GetAllCompanies();
+            return Ok(companies);
+        }
     }
 }

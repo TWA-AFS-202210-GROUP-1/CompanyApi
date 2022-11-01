@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
@@ -51,6 +52,26 @@ namespace CompanyApiTest.Controllers
 
             // then
             Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Should_return_ok_when_get_all_company()
+        {
+            // given
+            var company01 = new Company("SLB");
+            var company02 = new Company("TW");
+            await _httpClient.PostAsJsonAsync("/companies", company01);
+            await _httpClient.PostAsJsonAsync("/companies", company02);
+
+            // when
+            var response = await _httpClient.GetAsync("/companies");
+            var responseString = await response.Content.ReadAsStringAsync();
+
+            var allCompanies = JsonConvert.DeserializeObject<IList<Company>>(responseString);
+
+            // then
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(2, allCompanies.Count);
         }
     }
 }

@@ -26,5 +26,10 @@ namespace CompanyApi.Services
 
             return newCompany;
         }
+
+        public IList<Company> GetAllCompanies()
+        {
+            return Companies;
+        }
     }
 }
