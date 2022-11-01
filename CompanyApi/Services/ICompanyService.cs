@@ -15,4 +15,6 @@ public interface ICompanyService
     public Employee AddEmployeeToCompany(string companyId, Employee employee);
     public IList<Employee>? GetAllEmployeesInCompany(string companyId);
     public Employee? UpdateEmployee(string companyId, string employeeId, UpdateEmployeeDto info);
+    public bool DeleteEmployee(string companyId, string employeeId);
+    public Employee? GetEmployeeById(string companyId, string employeeId);
 }

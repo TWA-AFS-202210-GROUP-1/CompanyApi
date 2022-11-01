@@ -93,7 +93,7 @@ namespace CompanyApi.Controllers
         }
 
         [HttpGet("{companyId}/employees")]
-        public IActionResult AddEmployeeToCompany([FromRoute] string companyId)
+        public IActionResult GetAllEmployeesInCompany([FromRoute] string companyId)
         {
             var employees = _companyService.GetAllEmployeesInCompany(companyId);
             if (employees == null)
@@ -104,8 +104,20 @@ namespace CompanyApi.Controllers
             return Ok(employees);
         }
 
+        [HttpGet("{companyId}/employees/{employeeId}")]
+        public IActionResult GetEmployeeInCompanyById([FromRoute] string companyId, [FromRoute] string employeeId)
+        {
+            var employee = _companyService.GetEmployeeById(companyId, employeeId);
+            if (employee == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(employee);
+        }
+
         [HttpPut("{companyId}/employees/{employeeId}")]
-        public IActionResult AddEmployeeToCompany([FromRoute] string companyId, [FromRoute] string employeeId, [FromBody] UpdateEmployeeDto info)
+        public IActionResult UpdateEmployeeInCompany([FromRoute] string companyId, [FromRoute] string employeeId, [FromBody] UpdateEmployeeDto info)
         {
             var employee = _companyService.UpdateEmployee(companyId, employeeId, info);
             if (employee == null)
@@ -114,6 +126,18 @@ namespace CompanyApi.Controllers
             }
 
             return Ok(employee);
+        }
+
+        [HttpDelete("{companyId}/employees/{employeeId}")]
+        public IActionResult DeleteEmployeeInCompany([FromRoute] string companyId, [FromRoute] string employeeId)
+        {
+            var isDelete = _companyService.DeleteEmployee(companyId, employeeId);
+            if (isDelete)
+            {
+                return NoContent();
+            }
+
+            return NotFound();
         }
     }
 }

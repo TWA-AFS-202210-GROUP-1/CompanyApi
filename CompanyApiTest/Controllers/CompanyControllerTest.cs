@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -12,14 +13,17 @@ using Xunit;
 
 namespace CompanyApiTest.Controllers
 {
-    public class CompanyControllerTest
+    public class CompanyControllerTest: IDisposable
     {
         private readonly HttpClient _httpClient;
         public CompanyControllerTest()
         {
             var application = new WebApplicationFactory<Program>();
             _httpClient = application.CreateClient();
+        }
 
+        public void Dispose()
+        {
             _httpClient.DeleteAsync("/companies");
         }
 
@@ -216,6 +220,30 @@ namespace CompanyApiTest.Controllers
             Assert.Equal(HttpStatusCode.OK, updateEmployeeResponse.StatusCode);
             Assert.Equal("Du", updateEmployee.Name);
             Assert.Equal(50, updateEmployee.Salary);
+        }
+
+        [Fact]
+        public async Task Should_return_no_content_when_delete_employee_successfully_given_an_existed_ids()
+        {
+            // given
+            var company = new Company("SLB");
+            var companyResponse = await _httpClient.PostAsJsonAsync("/companies", company);
+            var companyResponseString = await companyResponse.Content.ReadAsStringAsync();
+            var createdCompany = JsonConvert.DeserializeObject<Company>(companyResponseString);
+            var companyId = createdCompany.Id;
+            var employee = new Employee("Xu", 100);
+            var createdEmployeeResponse = await _httpClient.PostAsJsonAsync($"/companies/{companyId}/employees", employee);
+            var createdEmployeeResponseString = await createdEmployeeResponse.Content.ReadAsStringAsync();
+            var createdEmployee = JsonConvert.DeserializeObject<Employee>(createdEmployeeResponseString);
+            // when
+
+            var deleteEmployeeResponse = await _httpClient.DeleteAsync($"/companies/{companyId}/employees/{createdEmployee.Id}");
+            var reGetDeletedEmployeeResponse = await _httpClient.GetAsync($"/companies/{companyId}/employees/{createdEmployee.Id}");
+
+            // then
+            deleteEmployeeResponse.EnsureSuccessStatusCode();
+            Assert.Equal(HttpStatusCode.NoContent, deleteEmployeeResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.NotFound, reGetDeletedEmployeeResponse.StatusCode);
         }
     }
 }

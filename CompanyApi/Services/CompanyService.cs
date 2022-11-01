@@ -81,6 +81,25 @@ namespace CompanyApi.Services
             return employee;
         }
 
+        public bool DeleteEmployee(string companyId, string employeeId)
+        {
+            var company = Companies.FirstOrDefault(_ => _.Id!.Equals(companyId));
+            var employee = company?.Employees?.FirstOrDefault(_ => _.Id!.Equals(employeeId));
+            if (employee != null)
+            {
+                company!.Employees!.Remove(employee);
+                return true;
+            }
+
+            return false;
+        }
+
+        public Employee? GetEmployeeById(string companyId, string employeeId)
+        {
+            var company = Companies.FirstOrDefault(_ => _.Id!.Equals(companyId));
+            return company?.Employees?.FirstOrDefault(_ => _.Id!.Equals(employeeId));
+        }
+
         public IList<Company> GetAllCompanies()
         {
             return Companies;
