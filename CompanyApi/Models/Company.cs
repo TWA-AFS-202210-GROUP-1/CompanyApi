@@ -10,6 +10,7 @@ public class Company
     public IList<Employee> Employees { get; set; }
     public Company(string name)
     {
+        Id = Guid.NewGuid().ToString();
         Name = name;
         Employees = new List<Employee>();
     }

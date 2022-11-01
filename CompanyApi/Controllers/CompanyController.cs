@@ -19,9 +19,9 @@ namespace CompanyApi.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddNewCompany([FromBody] Company company)
+        public IActionResult AddNewCompany([FromBody] CreateCompanyDto createCompanyDto)
         {
-            var newCompany = _companyService.AddNewCompany(company);
+            var newCompany = _companyService.AddNewCompany(createCompanyDto);
             if (newCompany == null)
             {
                 return Conflict();
@@ -93,9 +93,9 @@ namespace CompanyApi.Controllers
         }
 
         [HttpPost("{companyId}/employees")]
-        public IActionResult AddEmployeeToCompany([FromRoute] string companyId, [FromBody] Employee employee)
+        public IActionResult AddEmployeeToCompany([FromRoute] string companyId, [FromBody] CreateEmployeeDto createEmployeeDto)
         {
-            var newEmployee = _companyService.AddEmployeeToCompany(companyId, employee);
+            var newEmployee = _companyService.AddEmployeeToCompany(companyId, createEmployeeDto);
             if (string.IsNullOrEmpty(newEmployee.Id))
             {
                 return NotFound();

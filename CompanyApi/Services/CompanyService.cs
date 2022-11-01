@@ -15,14 +15,14 @@ namespace CompanyApi.Services
             Companies = new List<Company>();
         }
 
-        public Company? AddNewCompany(Company newCompany)
+        public Company? AddNewCompany(CreateCompanyDto createCompanyDto)
         {
-            if (Companies.Any(_ => _.Name.Equals(newCompany.Name, StringComparison.CurrentCultureIgnoreCase)))
+            if (Companies.Any(_ => _.Name.Equals(createCompanyDto.Name, StringComparison.CurrentCultureIgnoreCase)))
             {
                 return null;
             }
 
-            newCompany.Id = Guid.NewGuid().ToString();
+            var newCompany = new Company(createCompanyDto.Name);
             Companies.Add(newCompany);
 
             return newCompany;
@@ -62,16 +62,17 @@ namespace CompanyApi.Services
 
         }
 
-        public Employee AddEmployeeToCompany(string companyId, Employee employee)
+        public Employee? AddEmployeeToCompany(string companyId, CreateEmployeeDto createEmployeeDto)
         {
             var company = Companies.FirstOrDefault(_ => _.Id!.Equals(companyId));
             if (company != null)
             {
-                employee.Id = Guid.NewGuid().ToString();
-                company.Employees.Add(employee);
+                var newEmployee = new Employee(createEmployeeDto.Name, createEmployeeDto.Salary);
+                company.Employees.Add(newEmployee);
+                return newEmployee;
             }
 
-            return employee;
+            return null;
         }
 
         public IList<Employee>? GetAllEmployeesInCompany(string companyId)

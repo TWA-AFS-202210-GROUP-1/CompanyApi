@@ -1,4 +1,6 @@
-﻿namespace CompanyApi.Models;
+﻿using System;
+
+namespace CompanyApi.Models;
 
 public class Employee
 {
@@ -8,6 +10,7 @@ public class Employee
 
     public Employee(string name, double salary)
     {
+        Id = Guid.NewGuid().ToString();
         Name = name;
         Salary = salary;
     }
