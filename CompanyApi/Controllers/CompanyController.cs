@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CompanyApi.Controllers
 {
@@ -33,8 +34,14 @@ namespace CompanyApi.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<Company>> GetAllCompanies()
+        public ActionResult<List<Company>> GetAllCompanies([FromQuery] int? pageSize, [FromQuery] int? pageIndex)
         {
+            //int maxIndex = companies.Count % pageSize.Value;
+            if (pageSize != null && pageIndex != null)
+            {
+                return Ok(companies.Skip((pageIndex.Value - 1) * pageSize.Value).Take(pageSize.Value).ToList());              
+            }
+
             return Ok(companies);
         }
 
@@ -47,6 +54,19 @@ namespace CompanyApi.Controllers
                 return NotFound();
             }
 
+            return Ok(company);
+        }
+
+        [HttpPut("{companyID}")]
+        public ActionResult<Company> UpdateCompanyByID([FromRoute] string companyID, [FromBody] Company editedCompany)
+        {
+            Company company = companies.Find(x => x.CompanyID == companyID);
+            if (company == null)
+            {
+                return NotFound();
+            }
+
+            company.Name = editedCompany.Name;
             return Ok(company);
         }
     }

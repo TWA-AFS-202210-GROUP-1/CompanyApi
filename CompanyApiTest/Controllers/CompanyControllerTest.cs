@@ -83,7 +83,7 @@ namespace CompanyApiTest.Controllers
         }
 
         [Fact]
-        public async Task Should_return_copany_successfully_given_company_Id()
+        public async Task Should_return_company_successfully_given_company_Id()
         {
             // given
             List<Company> companies = new List<Company>() { new Company(name: "SLB"), new Company(name: "Apple") };
@@ -108,6 +108,54 @@ namespace CompanyApiTest.Controllers
             var targetResponseBody = await targetResponse.Content.ReadAsStringAsync();
             var targetCompany = JsonConvert.DeserializeObject<Company>(targetResponseBody);
             Assert.Equal("Apple", targetCompany.Name);
+        }
+
+        [Fact]
+        public async Task Should_return_copanies_successfully_given_page_size_and_index()
+        {
+            // given
+            Company company = new Company(name: "SLB");
+            var application = new WebApplicationFactory<Program>();
+            var httpClient = application.CreateClient();
+            await httpClient.DeleteAsync("/companies");
+            var companyJson = JsonConvert.SerializeObject(company);
+            var postBody = new StringContent(companyJson, Encoding.UTF8, mediaType: "application/json");
+            _ = await httpClient.PostAsync("/companies", postBody);
+
+            // when
+            var targetResponse = await httpClient.GetAsync($"/companies?pageSize=2&&pageIndex=1");
+            // then
+            Assert.Equal(HttpStatusCode.OK, targetResponse.StatusCode);
+            var targetResponseBody = await targetResponse.Content.ReadAsStringAsync();
+            var targetCompanies = JsonConvert.DeserializeObject<List<Company>>(targetResponseBody);
+            Assert.Equal("SLB", targetCompanies[0].Name);
+        }
+
+        [Fact]
+        public async Task Should_return_updated_company_successfully()
+        {
+            // given
+            Company company = new Company(name: "SLB");
+            var application = new WebApplicationFactory<Program>();
+            var httpClient = application.CreateClient();
+            await httpClient.DeleteAsync("/companies");
+            var companyJson = JsonConvert.SerializeObject(company);
+            var postBody = new StringContent(companyJson, Encoding.UTF8, mediaType: "application/json");
+            var response = await httpClient.PostAsync("/companies", postBody);
+            var responseBody = await response.Content.ReadAsStringAsync();
+            var responseCompany = JsonConvert.DeserializeObject<Company>(responseBody).CompanyID;
+            company.CompanyID = responseCompany;
+            company.Name = "slb";
+            var editedCompanyJson = JsonConvert.SerializeObject(company);
+            var editedPostBody = new StringContent(editedCompanyJson, Encoding.UTF8, mediaType: "application/json");
+
+            // when
+            var targetResponse = await httpClient.PutAsync($"/companies/{responseCompany}", editedPostBody);
+            // then
+            Assert.Equal(HttpStatusCode.OK, targetResponse.StatusCode);
+            var targetResponseBody = await targetResponse.Content.ReadAsStringAsync();
+            var targetCompany = JsonConvert.DeserializeObject<Company>(targetResponseBody);
+            Assert.Equal("slb", targetCompany.Name);
         }
     }
 }
