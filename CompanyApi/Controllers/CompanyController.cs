@@ -28,13 +28,13 @@ namespace CompanyApi.Controllers
       }
     }
 
-    [HttpPost("{companyId}/Employees")]
+    [HttpPost("{companyId}/employees")]
     public IActionResult AddNewEmployee([FromRoute] string companyId, Employee employee)
     {
       var targetCompany = companies.First(company => company.CompanyId.Equals(companyId));
       targetCompany.Employees.Add(employee);
 
-      return Created($"/companies/{targetCompany.CompanyId}/Employees", targetCompany);
+      return Created($"/companies/{targetCompany.CompanyId}/employees", targetCompany);
     }
 
     [HttpGet]
@@ -75,7 +75,7 @@ namespace CompanyApi.Controllers
       }
     }
 
-    [HttpGet("{companyId}/Employees")]
+    [HttpGet("{companyId}/employees")]
     public IActionResult GetEmployees([FromRoute] string companyId)
     {
       try
@@ -99,6 +99,24 @@ namespace CompanyApi.Controllers
         returnedCompany.Name = updatedCompany.Name;
 
         return Ok(returnedCompany);
+      }
+      catch (Exception e)
+      {
+        return NotFound(e.Message);
+      }
+    }
+
+    [HttpPut("{companyId}/employees/{employeeId}")]
+    public IActionResult UpdateCompanyInformation([FromRoute] string companyId, [FromRoute] string employeeId, Employee updatedEmployee)
+    {
+      try
+      {
+        var returnedCompany = companies.First(company => company.CompanyId.Equals(companyId));
+        var returnedEmployee = returnedCompany.Employees.First(employee => employee.EmployeeId.Equals(employeeId));
+        returnedEmployee.Name = updatedEmployee.Name;
+        returnedEmployee.Salary = updatedEmployee.Salary;
+
+        return Ok(returnedEmployee);
       }
       catch (Exception e)
       {
