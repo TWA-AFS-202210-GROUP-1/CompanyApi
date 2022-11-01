@@ -22,5 +22,19 @@ namespace CompanyApi.Controllers
         {
             return companys;
         }
+
+        [HttpGet("companys/{companyname}")]
+        public ActionResult<Company> GetAllCompanys(string companyname)
+        {
+            foreach (var company in companys)
+            {
+                if (company.Name == companyname)
+                {
+                    return company;
+                }
+            }
+
+            return NotFound();
+        }
     }
 }
