@@ -7,7 +7,7 @@ namespace CompanyApi.Services
 {
     public class CompanyService : ICompanyService
     {
-        public IList<Company> Companies { get; set; }
+        public List<Company> Companies { get; set; }
 
         public CompanyService()
         {
@@ -27,14 +27,19 @@ namespace CompanyApi.Services
             return newCompany;
         }
 
+        public void DeleteAllCompany()
+        {
+            Companies.Clear();
+        }
+
         public IList<Company> GetAllCompanies()
         {
             return Companies;
         }
 
-        public Company? GetCompany(string name)
+        public Company? GetCompanyById(string id)
         {
-            return Companies.FirstOrDefault(_ => _.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase));
+            return Companies.FirstOrDefault(_ => _.Id!.Equals(id, StringComparison.CurrentCultureIgnoreCase));
         }
     }
 }

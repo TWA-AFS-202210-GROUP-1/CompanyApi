@@ -1,4 +1,5 @@
-﻿using CompanyApi.Models;
+﻿using System.ComponentModel.DataAnnotations;
+using CompanyApi.Models;
 using CompanyApi.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,10 +34,17 @@ namespace CompanyApi.Controllers
             return Ok(companies);
         }
 
-        [HttpGet("{name}")]
-        public IActionResult GetCompany([FromRoute] string name)
+        [HttpDelete]
+        public IActionResult DeleteAllCompanies()
         {
-            var company = _companyService.GetCompany(name);
+            _companyService.DeleteAllCompany();
+            return NoContent();
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult GetCompanyById([FromRoute] string id)
+        {
+            var company = _companyService.GetCompanyById(id);
             if (company == null)
             {
                 return NotFound();

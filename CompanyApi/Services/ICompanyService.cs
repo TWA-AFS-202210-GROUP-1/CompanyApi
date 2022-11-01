@@ -7,5 +7,6 @@ public interface ICompanyService
 {
     public Company? AddNewCompany(Company newCompany);
     public IList<Company> GetAllCompanies();
-    public Company? GetCompany(string name);
+    public Company? GetCompanyById(string id);
+    public void DeleteAllCompany();
 }

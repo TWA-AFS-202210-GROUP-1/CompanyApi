@@ -17,6 +17,8 @@ namespace CompanyApiTest.Controllers
         {
             var application = new WebApplicationFactory<Program>();
             _httpClient = application.CreateClient();
+
+            _httpClient.DeleteAsync("/companies");
         }
 
         [Fact]
@@ -36,6 +38,7 @@ namespace CompanyApiTest.Controllers
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             Assert.NotNull(createdCompany.Id);
         }
+
         [Fact]
         public async Task Should_return_conflict_with_when_add_company_given_a_exist_company_name()
         {
@@ -45,9 +48,6 @@ namespace CompanyApiTest.Controllers
 
             // when
             var response = await _httpClient.PostAsJsonAsync("/companies", company);
-            var responseString = await response.Content.ReadAsStringAsync();
-
-            var createdCompany = JsonConvert.DeserializeObject<Company>(responseString);
 
             // then
             Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
@@ -74,14 +74,16 @@ namespace CompanyApiTest.Controllers
         }
 
         [Fact]
-        public async Task Should_return_ok_when_get_an_company_given_an_exist_company_name()
+        public async Task Should_return_ok_when_get_an_company_given_an_exist_company_id()
         {
             // given
             var company = new Company("SLB");
-            await _httpClient.PostAsJsonAsync("/companies", company);
+            var createdCompanyResponse = await _httpClient.PostAsJsonAsync("/companies", company);
+            var createdCompanyString = await createdCompanyResponse.Content.ReadAsStringAsync();
+            var createdCompany = JsonConvert.DeserializeObject<Company>(createdCompanyString);
 
             // when
-            var response = await _httpClient.GetAsync("/companies/SLB");
+            var response = await _httpClient.GetAsync($"/companies/{createdCompany.Id}");
             var responseString = await response.Content.ReadAsStringAsync();
 
             var slb = JsonConvert.DeserializeObject<Company>(responseString);
