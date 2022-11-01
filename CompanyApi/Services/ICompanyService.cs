@@ -7,4 +7,5 @@ public interface ICompanyService
 {
     public Company? AddNewCompany(Company newCompany);
     public IList<Company> GetAllCompanies();
+    public Company? GetCompany(string name);
 }

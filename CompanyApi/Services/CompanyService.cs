@@ -16,7 +16,7 @@ namespace CompanyApi.Services
 
         public Company? AddNewCompany(Company newCompany)
         {
-            if (Companies.Any(_ => _.Name.Equals(newCompany.Name)))
+            if (Companies.Any(_ => _.Name.Equals(newCompany.Name, StringComparison.CurrentCultureIgnoreCase)))
             {
                 return null;
             }
@@ -30,6 +30,11 @@ namespace CompanyApi.Services
         public IList<Company> GetAllCompanies()
         {
             return Companies;
+        }
+
+        public Company? GetCompany(string name)
+        {
+            return Companies.FirstOrDefault(_ => _.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase));
         }
     }
 }

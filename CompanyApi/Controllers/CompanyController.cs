@@ -32,5 +32,17 @@ namespace CompanyApi.Controllers
             var companies = _companyService.GetAllCompanies();
             return Ok(companies);
         }
+
+        [HttpGet("{name}")]
+        public IActionResult GetCompany([FromRoute] string name)
+        {
+            var company = _companyService.GetCompany(name);
+            if (company == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(company);
+        }
     }
 }
