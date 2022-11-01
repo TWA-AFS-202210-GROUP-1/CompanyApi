@@ -284,6 +284,31 @@ namespace CompanyApiTest.Controllers
       Assert.Equal(HttpStatusCode.NotFound, getResponse.StatusCode);
     }
 
+    [Fact]
+    public async void Should_remove_company_by_id_from_system()
+    {
+      // given
+      var httpClient = await InitializeHttpClient();
+      var companies = new List<Company>
+      {
+        new Company("SLB"),
+        new Company("TW"),
+      };
+      var employee = new Employee("Bob", 1000);
+      foreach (var company in companies)
+      {
+        await CreateTestSubject(httpClient, company);
+      }
+
+      var serializedObject = JsonConvert.SerializeObject(employee);
+      var postBody = new StringContent(serializedObject, Encoding.UTF8, "application/json");
+      await httpClient.PostAsync($"/companies/{companies[0].CompanyId}/employees", postBody);
+      // when
+      var response = await httpClient.DeleteAsync($"/companies/{companies[0].CompanyId}");
+      // then
+      Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+    }
+
     private static async Task<HttpClient> InitializeHttpClient()
     {
       var application = new WebApplicationFactory<Program>();

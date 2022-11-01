@@ -130,8 +130,17 @@ namespace CompanyApi.Controllers
       }
     }
 
+    [HttpDelete("{companyId}")]
+    public IActionResult DeleteCompanyById([FromRoute] string companyId)
+    {
+      var returnedCompany = companies.First(company => company.CompanyId.Equals(companyId));
+      companies.Remove(returnedCompany);
+
+      return NoContent();
+    }
+
     [HttpDelete("{companyId}/employees/{employeeId}")]
-    public IActionResult DeleteCompanyById([FromRoute] string companyId, [FromRoute] string employeeId)
+    public IActionResult DeleteEmployeeById([FromRoute] string companyId, [FromRoute] string employeeId)
     {
       var returnedCompany = companies.First(company => company.CompanyId.Equals(companyId));
       var returnedEmployee = returnedCompany.Employees.First(employee => employee.EmployeeId.Equals(employeeId));
