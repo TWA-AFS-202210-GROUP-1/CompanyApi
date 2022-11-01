@@ -168,7 +168,42 @@ namespace CompanyApiTest.Controllers
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var responseBody = await response.Content.ReadAsStringAsync();
             var fetchCompanyList = JsonConvert.DeserializeObject<List<Company>>(responseBody);
-            fetchCompanyList.ShouldDeepEqual(companyList.GetRange(0, 2));
+            fetchCompanyList.ShouldDeepEqual(companyList.GetRange(3, 5));
+        }
+
+        [Fact]
+        public async void Should_return_new_company_Given_new_company_name()
+        {
+            //given
+            var application = new WebApplicationFactory<Program>();
+            var httpClient = application.CreateClient();
+            _ = httpClient.DeleteAsync("/companies");
+
+            var companyNameList = new List<string>()
+            {
+                "Umbrella",
+                "Tencent",
+                "Sony",
+                "Nintendo",
+                "Valve",
+                "Rockstar",
+                "Electronic Arts",
+                "Activision Blizzard",
+                "Ubisoft",
+            };
+            List<Company> companyList = await AddMultiCompaniesToBackend(httpClient, companyNameList);
+            Company newCompany = new Company(companyName: "new company name");
+            var newCompanyJson = JsonConvert.SerializeObject(newCompany);
+            var postBody = new StringContent(newCompanyJson, Encoding.UTF8, "application/json");
+
+            //when
+            var response = await httpClient.PutAsync($"/companies/{companyList[0].CompanyId}", postBody);
+
+            // then
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var responseBody = await response.Content.ReadAsStringAsync();
+            var fetchCompany = JsonConvert.DeserializeObject<Company>(responseBody);
+            Assert.Equal(newCompany.CompanyName, fetchCompany.CompanyName);
         }
 
         private static async Task<List<Company>> AddMultiCompaniesToBackend(HttpClient httpClient, List<string> companyNameList)

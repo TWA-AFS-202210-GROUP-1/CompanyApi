@@ -55,5 +55,19 @@ namespace CompanyApi.Controllers
                 return new NotFoundResult();
             }
         }
+
+        [HttpPut("companies/{companyId}")]
+        public ActionResult<Company> UpdateCompanyName([FromBody] Company company, [FromRoute] string companyId)
+        {
+            if (companiesList.Exists(x => x.CompanyId.Equals(companyId)))
+            {
+                companiesList.Find(x => x.CompanyId.Equals(companyId)).CompanyName = company.CompanyName;
+                return Ok(companiesList.Find(x => x.CompanyId.Equals(companyId)));
+            }
+            else
+            {
+                return new NotFoundResult();
+            }
+        }
     }
 }
