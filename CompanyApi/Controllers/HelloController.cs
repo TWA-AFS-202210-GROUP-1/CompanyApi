@@ -1,15 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
 
 namespace CompanyApi.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
-    public class HelloController : ControllerBase
+    [Route("api")]
+    public class CompanyController : ControllerBase
     {
-        [HttpGet]
-        public string Get()
+        private static List<Company> companys = new List<Company>();
+        [HttpPost("companys")]
+        public ActionResult<Company> AddNewCompany(Company company)
         {
-            return "Hello World";
+            company.CompanyID = Guid.NewGuid().ToString();
+            companys.Add(company);
+            return new CreatedResult("/companies/{company.CompanyID}", company);
         }
     }
 }
