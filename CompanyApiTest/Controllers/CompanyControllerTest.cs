@@ -197,5 +197,44 @@ namespace CompanyApi.Controllers
             Assert.Equal("CBA", createdCompany.Name);
             Assert.NotEmpty(createdCompany.CompanyID);
         }
+
+        [Fact]
+        public async Task Should_add_an_employee_to_an_existed_company()
+        {
+            // given
+            var application = new WebApplicationFactory<Program>();
+            var httpClient = application.CreateClient();
+            /*
+             * Method: POST
+             * URI: /opi/addNewPet
+             * Body:
+             * {
+             *  "name: "Kitty",
+             *  "type":"cat",
+             *  "color":"white",
+             *  "price": 1000
+             * }
+             */
+            var company = new Company(name: "ABC");
+            var companyJSON = JsonConvert.SerializeObject(company);
+            var postBody = new StringContent(companyJSON, Encoding.UTF8, "application/json");
+            var response = await httpClient.PostAsync("/api/companys", postBody);
+            var responseBody = await response.Content.ReadAsStringAsync();
+            var createdCompany = JsonConvert.DeserializeObject<Company>(responseBody);
+            var id = createdCompany.CompanyID;
+            // when
+            var employee = new Employee(name: "Tom");
+            var employeeJSON = JsonConvert.SerializeObject(employee);
+            postBody = new StringContent(employeeJSON, Encoding.UTF8, "application/json");
+            response = await httpClient.PostAsync($"/api/companys/{id}/employees", postBody);
+
+            // then
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            responseBody = await response.Content.ReadAsStringAsync();
+            var createdEmployee = JsonConvert.DeserializeObject<Employee>(responseBody);
+
+            Assert.Equal("Tom", createdEmployee.Name);
+            Assert.NotEmpty(createdEmployee.EmployeeID);
+        }
     }
 }

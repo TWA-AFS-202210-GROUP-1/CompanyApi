@@ -58,5 +58,21 @@ namespace CompanyApi.Controllers
 
             return NotFound();
         }
+
+        [HttpPost("companys/{companyid}/employees")]
+        public ActionResult<string> AddNewEmployeetoCompany([FromRoute] string companyid, Employee employee)
+        {
+            employee.EmployeeID = Guid.NewGuid().ToString();
+            foreach (var company in companys)
+            {
+            if (companyid == company.CompanyID)
+            {
+               company.AddEmployee(employee);
+               return new CreatedResult("/companies/{companyid}/employees/{employee.EmployeeID}", employee);
+            }
+            }
+
+            return NotFound();
+        }
     }
 }
