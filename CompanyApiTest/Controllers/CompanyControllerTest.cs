@@ -326,5 +326,43 @@ namespace CompanyApi.Controllers
 
             Assert.Equal("Jerry", createdEmployee.Name);
         }
+
+        [Fact]
+        public async Task Should_delete_a_employee_from_a_company()
+        {
+            // given
+            var application = new WebApplicationFactory<Program>();
+            var httpClient = application.CreateClient();
+            /*
+             * Method: POST
+             * URI: /opi/addNewPet
+             * Body:
+             * {
+             *  "name: "Kitty",
+             *  "type":"cat",
+             *  "color":"white",
+             *  "price": 1000
+             * }
+             */
+            var company = new Company(name: "ABC");
+            var companyJSON = JsonConvert.SerializeObject(company);
+            var postBody = new StringContent(companyJSON, Encoding.UTF8, "application/json");
+            var response = await httpClient.PostAsync("/api/companys", postBody);
+            var responseBody = await response.Content.ReadAsStringAsync();
+            var createdCompany = JsonConvert.DeserializeObject<Company>(responseBody);
+            var id = createdCompany.CompanyID;
+            // when
+            var employee = new Employee(name: "Tom");
+            var employeeJSON = JsonConvert.SerializeObject(employee);
+            postBody = new StringContent(employeeJSON, Encoding.UTF8, "application/json");
+            response = await httpClient.PostAsync($"/api/companys/{id}/employees", postBody);
+            responseBody = await response.Content.ReadAsStringAsync();
+            var createdEmployee = JsonConvert.DeserializeObject<Employee>(responseBody);
+            var employeeid = createdEmployee.EmployeeID;
+            response = await httpClient.DeleteAsync($"/api/companys/{id}/employees/{employeeid}");
+
+            // then
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        }
     }
 }

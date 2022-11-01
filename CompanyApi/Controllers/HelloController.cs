@@ -109,5 +109,26 @@ namespace CompanyApi.Controllers
 
             return NotFound();
         }
+
+        [HttpDelete("companys/{companyid}/employees/{employeeid}")]
+        public ActionResult<Employee> Deleteemployee([FromRoute] string companyid, [FromRoute] string employeeid)
+        {
+            foreach (var existedcompany in companys)
+            {
+                if (existedcompany.CompanyID == companyid)
+                {
+                    for (int i = 0; i < existedcompany.Employees.Count; i++)
+                    {
+                        if (existedcompany.Employees[i].EmployeeID == employeeid)
+                        {
+                            existedcompany.Employees.RemoveAt(i);
+                            return NoContent();
+                        }
+                    }
+                }
+            }
+
+            return NotFound();
+        }
     }
 }
