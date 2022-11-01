@@ -227,7 +227,7 @@ namespace CompanyApiTest.Controllers
                 "Ubisoft",
             };
             List<Company> companyList = await AddMultiCompaniesToBackend(httpClient, companyNameList);
-            Employee newEmployee = new Employee();
+            Employee newEmployee = new Employee("Ana", 10000);
             var newEmployeeJson = JsonConvert.SerializeObject(newEmployee);
             var postBody = new StringContent(newEmployeeJson, Encoding.UTF8, "application/json");
 
@@ -264,7 +264,7 @@ namespace CompanyApiTest.Controllers
             List<Company> companyList = await AddMultiCompaniesToBackend(httpClient, companyNameList);
             _ = httpClient.DeleteAsync("/companies/employee");
 
-            Employee newEmployee = new Employee();
+            Employee newEmployee = new Employee("Ana", 10000);
             List<Employee> exceptedEmployeeList = new List<Employee>() { newEmployee };
             var newEmployeeJson = JsonConvert.SerializeObject(newEmployee);
             var postBody = new StringContent(newEmployeeJson, Encoding.UTF8, "application/json");
