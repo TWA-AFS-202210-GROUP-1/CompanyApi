@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CompanyApi.Dto;
 using CompanyApi.Models;
 
 namespace CompanyApi.Services
@@ -35,6 +36,17 @@ namespace CompanyApi.Services
         public IList<Company> GetCompaniesByPage(int pageSize, int index)
         { 
             return Companies.Skip((pageSize - 1) * pageSize).Take(pageSize).ToList();
+        }
+
+        public Company? UpdateCompany(string id, CompanyUpdateDto updateInfo)
+        {
+            var updatingCompany = Companies.FirstOrDefault(_ => _.Id!.Equals(id));
+            if (updatingCompany != null)
+            {
+                updatingCompany.Name = updateInfo.Name;
+            }
+
+            return updatingCompany;
         }
 
         public IList<Company> GetAllCompanies()

@@ -2,7 +2,9 @@
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text;
 using System.Threading.Tasks;
+using CompanyApi.Dto;
 using CompanyApi.Models;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Newtonsoft.Json;
@@ -92,6 +94,7 @@ namespace CompanyApiTest.Controllers
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Equal("SLB", slb.Name);
         }
+
         [Fact]
         public async Task Should_return_ok_when_get_an_2_company_given_page_size_and_index_from()
         {
@@ -119,6 +122,27 @@ namespace CompanyApiTest.Controllers
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Equal(2, companiesResponse.Count);
             Assert.Equal("Facebook", companiesResponse[0].Name);
+        }
+
+        [Fact]
+        public async Task Should_return_updated_company_when_update_company_give_update_information()
+        {
+            // given
+            var company = new Company("SLB");
+            var createdCompanyResponse = await _httpClient.PostAsJsonAsync("/companies", company);
+            var createdCompanyString = await createdCompanyResponse.Content.ReadAsStringAsync();
+            var createdCompany = JsonConvert.DeserializeObject<Company>(createdCompanyString);
+            var companyUpdate = new CompanyUpdateDto() { Name = "SLB-2" };
+
+            // when
+            var response = await _httpClient.PutAsJsonAsync($"/companies/{createdCompany.Id}", companyUpdate);
+            var responseString = await response.Content.ReadAsStringAsync();
+
+            var companyResponse = JsonConvert.DeserializeObject<Company>(responseString);
+
+            // then
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("SLB-2", companyResponse.Name);
         }
     }
 }

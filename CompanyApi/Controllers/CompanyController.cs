@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using CompanyApi.Dto;
 using CompanyApi.Models;
 using CompanyApi.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -65,6 +66,18 @@ namespace CompanyApi.Controllers
             }
 
             return Ok(company);
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateCompanyInfo([FromRoute] string id, [FromBody] CompanyUpdateDto updateInfo)
+        {
+            var updatedCompany = _companyService.UpdateCompany(id, updateInfo);
+            if (updatedCompany == null)
+            {
+                return NoContent();
+            }
+
+            return Ok(updatedCompany);
         }
     }
 }
