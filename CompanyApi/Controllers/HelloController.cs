@@ -37,18 +37,17 @@ namespace CompanyApi.Controllers
             return NotFound();
         }
 
-        [HttpGet("companys/size/{size}/from/{aa}")]
-        public ActionResult<Company> GetAllCompanys(string companyname)
+        [HttpGet("companys/size/{size}/from/{index}")]
+        public ActionResult<List<Company>> GetCompanysInRange(string size, string index)
         {
-            foreach (var company in companys)
+            List<Company> resultCompanys = new List<Company>();
+
+            for (int i = Convert.ToInt16(index); i < Convert.ToInt16(index) + Convert.ToInt16(size);  i++)
             {
-                if (company.Name == companyname)
-                {
-                    return company;
-                }
+                resultCompanys.Add(companys[i - 1]);
             }
 
-            return NotFound();
+            return resultCompanys;
         }
     }
 }

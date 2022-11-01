@@ -152,10 +152,11 @@ namespace CompanyApi.Controllers
             // then
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var responseBody = await response.Content.ReadAsStringAsync();
-            var createdCompany = JsonConvert.DeserializeObject<Company>(responseBody);
+            var createdCompany = JsonConvert.DeserializeObject<List<Company>>(responseBody);
 
-            Assert.Equal("ABC", createdCompany.Name);
-            Assert.NotEmpty(createdCompany.CompanyID);
+            Assert.Equal(2, createdCompany.Count);
+            Assert.Equal("CBA", createdCompany[0].Name);
+            Assert.Equal("NBA", createdCompany[1].Name);
         }
     }
 }
