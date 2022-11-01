@@ -132,7 +132,7 @@ namespace CompanyApiTest.Controllers
             var createdCompanyResponse = await _httpClient.PostAsJsonAsync("/companies", company);
             var createdCompanyString = await createdCompanyResponse.Content.ReadAsStringAsync();
             var createdCompany = JsonConvert.DeserializeObject<Company>(createdCompanyString);
-            var companyUpdate = new CompanyUpdateDto() { Name = "SLB-2" };
+            var companyUpdate = new UpdateCompanyDto() { Name = "SLB-2" };
 
             // when
             var response = await _httpClient.PutAsJsonAsync($"/companies/{createdCompany.Id}", companyUpdate);
@@ -189,6 +189,33 @@ namespace CompanyApiTest.Controllers
             Assert.Equal(HttpStatusCode.OK, allEmployeesResponse.StatusCode);
             Assert.Equal(1, allEmployees.Count);
             Assert.Equal("Xu", allEmployees[0].Name);
+        }
+
+        [Fact]
+        public async Task Should_return_updated_employee_for_company_when_update_successfully_given_an_update_info()
+        {
+            // given
+            var company = new Company("SLB");
+            var companyResponse = await _httpClient.PostAsJsonAsync("/companies", company);
+            var companyResponseString = await companyResponse.Content.ReadAsStringAsync();
+            var createdCompany = JsonConvert.DeserializeObject<Company>(companyResponseString);
+            var companyId = createdCompany.Id;
+            var employee = new Employee("Xu", 100);
+            var createdEmployeeResponse = await _httpClient.PostAsJsonAsync($"/companies/{companyId}/employees", employee);
+            var createdEmployeeResponseString = await createdEmployeeResponse.Content.ReadAsStringAsync();
+            var createdEmployee = JsonConvert.DeserializeObject<Employee>(createdEmployeeResponseString);
+            var updateEmployeeInfo = new UpdateEmployeeDto() { Name = "Du", Salary = 50 };
+            // when
+
+            var updateEmployeeResponse = await _httpClient.PutAsJsonAsync($"/companies/{companyId}/employees/{createdEmployee.Id}", updateEmployeeInfo);
+            var updateEmployeeResponseString = await updateEmployeeResponse.Content.ReadAsStringAsync();
+            var updateEmployee = JsonConvert.DeserializeObject<Employee>(updateEmployeeResponseString);
+
+            // then
+            updateEmployeeResponse.EnsureSuccessStatusCode();
+            Assert.Equal(HttpStatusCode.OK, updateEmployeeResponse.StatusCode);
+            Assert.Equal("Du", updateEmployee.Name);
+            Assert.Equal(50, updateEmployee.Salary);
         }
     }
 }

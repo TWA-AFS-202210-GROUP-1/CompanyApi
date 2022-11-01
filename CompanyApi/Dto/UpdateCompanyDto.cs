@@ -1,6 +1,6 @@
 ﻿namespace CompanyApi.Dto
 {
-    public class CompanyUpdateDto
+    public class UpdateCompanyDto
     {
         public string Name { get; set; }
     }

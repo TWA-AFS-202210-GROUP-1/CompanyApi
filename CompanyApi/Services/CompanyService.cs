@@ -38,12 +38,12 @@ namespace CompanyApi.Services
             return Companies.Skip((pageSize - 1) * pageSize).Take(pageSize).ToList();
         }
 
-        public Company? UpdateCompany(string id, CompanyUpdateDto updateInfo)
+        public Company? UpdateCompany(string id, UpdateCompanyDto info)
         {
             var updatingCompany = Companies.FirstOrDefault(_ => _.Id!.Equals(id));
             if (updatingCompany != null)
             {
-                updatingCompany.Name = updateInfo.Name;
+                updatingCompany.Name = info.Name;
             }
 
             return updatingCompany;
@@ -66,6 +66,19 @@ namespace CompanyApi.Services
             var company = Companies.FirstOrDefault(_ => _.Id!.Equals(companyId));
 
             return company?.Employees;
+        }
+
+        public Employee? UpdateEmployee(string companyId, string employeeId, UpdateEmployeeDto info)
+        {
+            var company = Companies.FirstOrDefault(_ => _.Id!.Equals(companyId));
+            var employee = company?.Employees?.FirstOrDefault(_ => _.Id!.Equals(employeeId));
+            if (employee != null)
+            {
+                employee.Name = info.Name;
+                employee.Salary = info.Salary;
+            }
+
+            return employee;
         }
 
         public IList<Company> GetAllCompanies()

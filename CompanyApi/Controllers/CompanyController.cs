@@ -69,9 +69,9 @@ namespace CompanyApi.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateCompanyInfo([FromRoute] string id, [FromBody] CompanyUpdateDto updateInfo)
+        public IActionResult UpdateCompanyInfo([FromRoute] string id, [FromBody] UpdateCompanyDto info)
         {
-            var updatedCompany = _companyService.UpdateCompany(id, updateInfo);
+            var updatedCompany = _companyService.UpdateCompany(id, info);
             if (updatedCompany == null)
             {
                 return NoContent();
@@ -102,6 +102,18 @@ namespace CompanyApi.Controllers
             }
 
             return Ok(employees);
+        }
+
+        [HttpPut("{companyId}/employees/{employeeId}")]
+        public IActionResult AddEmployeeToCompany([FromRoute] string companyId, [FromRoute] string employeeId, [FromBody] UpdateEmployeeDto info)
+        {
+            var employee = _companyService.UpdateEmployee(companyId, employeeId, info);
+            if (employee == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(employee);
         }
     }
 }
