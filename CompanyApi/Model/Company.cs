@@ -19,11 +19,5 @@ namespace CompanyApi.Model
         public string Name { get => name; set => name = value; }
         public List<Employee> Employees { get => employees; set => employees = value; }
 
-        public void AddNewEmployee(Employee employee)
-        {
-            employee.EmployeeID = Guid.NewGuid().ToString();
-            employees.Add(employee);
-            Console.WriteLine(employees);
-        }
     }
 }

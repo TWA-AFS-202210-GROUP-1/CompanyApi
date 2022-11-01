@@ -74,7 +74,8 @@ namespace CompanyApi.Controllers
         public ActionResult<Employee> AddEmployeeToCompany([FromRoute] string companyID, [FromBody] Employee employee)
         {
             Company company = companies.Find(x => x.CompanyID == companyID);
-            company.AddNewEmployee(employee);
+            employee.EmployeeID = Guid.NewGuid().ToString();
+            company.Employees.Add(employee);
             return Ok(employee);
         }
 
@@ -93,6 +94,23 @@ namespace CompanyApi.Controllers
             employee.Salary = employee.Salary;
             employee.Name = employee.Name;
             return Ok(employee);
+        }
+
+        [HttpDelete("{companyID}/employees/{employeeID}")]
+        public ActionResult DeleteEmployeesOfCompany([FromRoute] string companyID, [FromRoute] string employeeID)
+        {
+            Company company = companies.Find(x => x.CompanyID == companyID);
+            if (company != null)
+            {
+                Employee targetEmployee = company.Employees.Find(x => x.EmployeeID == employeeID);
+                if (targetEmployee != null)
+                {
+                    company.Employees.Remove(targetEmployee);
+                    return NoContent();
+                }
+            }
+
+            return NotFound();
         }
     }
 }
