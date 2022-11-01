@@ -23,8 +23,8 @@ namespace CompanyApiTest.Controllers
             _ = httpClient.DeleteAsync("/companies");
 
             Company company = new Company(companyName: "Umbrella");
-            var petJson = JsonConvert.SerializeObject(company);
-            var postBody = new StringContent(petJson, Encoding.UTF8, "application/json");
+            var companyJson = JsonConvert.SerializeObject(company);
+            var postBody = new StringContent(companyJson, Encoding.UTF8, "application/json");
 
             //when
             var response = await httpClient.PostAsync("/companies", postBody);
@@ -45,8 +45,8 @@ namespace CompanyApiTest.Controllers
             _ = httpClient.DeleteAsync("/companies");
 
             Company company = new Company(companyName: "Umbrella");
-            var petJson = JsonConvert.SerializeObject(company);
-            var postBody = new StringContent(petJson, Encoding.UTF8, "application/json");
+            var companyJson = JsonConvert.SerializeObject(company);
+            var postBody = new StringContent(companyJson, Encoding.UTF8, "application/json");
 
             //when
             await httpClient.PostAsync("/companies", postBody);
