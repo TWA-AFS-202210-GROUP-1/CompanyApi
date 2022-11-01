@@ -271,5 +271,28 @@ namespace CompanyApiTest.Controllers
             Assert.Equal(HttpStatusCode.NoContent, targetResponse.StatusCode);
             Assert.Equal(0, company.Employees.Count);
         }
+
+        [Fact]
+        public async Task Should_delete_a_company_successfully()
+        {
+            // given
+            Company company = new Company(name: "SLB");
+            var application = new WebApplicationFactory<Program>();
+            var httpClient = application.CreateClient();
+            await httpClient.DeleteAsync("/companies");
+            var companyJson = JsonConvert.SerializeObject(company);
+            var postBody = new StringContent(companyJson, Encoding.UTF8, mediaType: "application/json");
+            var response = await httpClient.PostAsync("/companies", postBody);
+            var responseBody = await response.Content.ReadAsStringAsync();
+            var responseCompany = JsonConvert.DeserializeObject<Company>(responseBody);
+            Employee employee = new Employee(name: "Winnie");
+            var employeeJson = JsonConvert.SerializeObject(employee);
+            var employeePostBody = new StringContent(employeeJson, Encoding.UTF8, mediaType: "application/json");
+            _ = await httpClient.PostAsync($"/companies/{responseCompany.CompanyID}/employees", employeePostBody);
+            // when
+            var targetResponse = await httpClient.DeleteAsync($"/companies/{responseCompany.CompanyID}");
+            // then
+            Assert.Equal(HttpStatusCode.NoContent, targetResponse.StatusCode);
+        }
     }
 }
