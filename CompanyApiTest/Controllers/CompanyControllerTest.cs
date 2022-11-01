@@ -79,6 +79,30 @@ namespace CompanyApiTest.Controllers
       }
     }
 
+    [Fact]
+    public async void Should_get_company_by_name_from_system()
+    {
+      // given
+      var httpClient = await InitializeHttpClient();
+      var companies = new List<Company>
+      {
+        new Company("SLB"),
+        new Company("TW"),
+      };
+      foreach (var company in companies)
+      {
+        await CreateTestSubject(httpClient, company);
+      }
+
+      // when
+      var response = await httpClient.GetAsync($"/companies/{companies[0].CompanyId}");
+      // then
+      Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+      var responseBody = await response.Content.ReadAsStringAsync();
+      var returnedCompany = JsonConvert.DeserializeObject<Company>(responseBody);
+      Assert.Equal(companies[0].Name, returnedCompany.Name);
+    }
+
     private static async Task<HttpClient> InitializeHttpClient()
     {
       var application = new WebApplicationFactory<Program>();

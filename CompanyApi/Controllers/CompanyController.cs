@@ -16,7 +16,6 @@ namespace CompanyApi.Controllers
     [HttpPost]
     public ActionResult<Company> AddNewCompany(Company company)
     {
-      company.CompanyId = Guid.NewGuid().ToString();
       if (!HasCompany(company))
       {
         companies.Add(company);
@@ -33,6 +32,21 @@ namespace CompanyApi.Controllers
     public IActionResult GetAllCompanies()
     {
       return Ok(companies);
+    }
+
+    [HttpGet("{id}")]
+    public IActionResult GetAllCompanies([FromRoute] string id)
+    {
+      try
+      {
+        var returnedCompany = companies.First(company => company.CompanyId.Equals(id));
+
+        return Ok(returnedCompany);
+      }
+      catch (Exception e)
+      {
+        return NotFound(e.Message);
+      }
     }
 
     [HttpDelete]

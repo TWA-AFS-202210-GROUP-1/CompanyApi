@@ -7,7 +7,7 @@ namespace CompanyApi.Model
     public Company(string name)
     {
       Name = name;
-      CompanyId = string.Empty;
+      CompanyId = Guid.NewGuid().ToString();
     }
 
     public string Name { get; set; }
