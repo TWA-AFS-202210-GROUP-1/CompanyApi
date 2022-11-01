@@ -130,5 +130,20 @@ namespace CompanyApi.Controllers
 
             return NotFound();
         }
+
+        [HttpDelete("companys/{companyid}")]
+        public ActionResult<Company> Deletecompany([FromRoute] string companyid)
+        {
+            for (int i = 0; i < companys.Count; i++)
+            {
+                if (companys[i].CompanyID == companyid)
+                {
+                    companys.RemoveAt(i);
+                    return NoContent();
+                }
+            }
+
+            return NotFound();
+        }
     }
 }
