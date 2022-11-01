@@ -52,14 +52,41 @@ namespace CompanyApiTest.Controllers
       Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
     }
 
-    //private static async Task<HttpClient> InitializeHttpClient()
-    //{
-    //  var application = new WebApplicationFactory<Program>();
-    //  var httpClient = application.CreateClient();
-    //  //await httpClient.DeleteAsync("/api/deleteAllPets");
+    [Fact]
+    public async void Should_get_all_companies_from_system()
+    {
+      // given
+      var httpClient = await InitializeHttpClient();
+      var companies = new List<Company>
+      {
+        new Company("SLB"),
+        new Company("TW"),
+      };
+      foreach (var company in companies)
+      {
+        await CreateTestSubject(httpClient, company);
+      }
 
-    //  return httpClient;
-    //}
+      // when
+      var response = await httpClient.GetAsync("/companies");
+      // then
+      Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+      var responseBody = await response.Content.ReadAsStringAsync();
+      var returnedCompanies = JsonConvert.DeserializeObject<List<Company>>(responseBody);
+      foreach (var company in returnedCompanies)
+      {
+        Assert.NotEmpty(company.CompanyId);
+      }
+    }
+
+    private static async Task<HttpClient> InitializeHttpClient()
+    {
+      var application = new WebApplicationFactory<Program>();
+      var httpClient = application.CreateClient();
+      await httpClient.DeleteAsync("/companies");
+
+      return httpClient;
+    }
 
     private static async Task<string> CreateTestSubject(HttpClient httpClient, Company company)
     {

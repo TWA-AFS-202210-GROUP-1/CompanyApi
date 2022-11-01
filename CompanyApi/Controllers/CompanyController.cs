@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 
 namespace CompanyApi.Controllers
@@ -26,6 +27,12 @@ namespace CompanyApi.Controllers
       {
         return new ConflictResult();
       }
+    }
+
+    [HttpGet]
+    public IActionResult GetAllCompanies()
+    {
+      return Ok(companies);
     }
 
     [HttpDelete]
