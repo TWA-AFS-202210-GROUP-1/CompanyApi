@@ -147,7 +147,7 @@ namespace CompanyApi.Controllers
             postBody = new StringContent(companyJSON, Encoding.UTF8, "application/json");
             await httpClient.PostAsync("/api/companys", postBody);
             // when
-            var response = await httpClient.GetAsync("/api/companys/size/2/from/2");
+            var response = await httpClient.GetAsync("/api/companys/?size=2&index=2");
 
             // then
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -155,8 +155,47 @@ namespace CompanyApi.Controllers
             var createdCompany = JsonConvert.DeserializeObject<List<Company>>(responseBody);
 
             Assert.Equal(2, createdCompany.Count);
-            Assert.Equal("CBA", createdCompany[0].Name);
-            Assert.Equal("NBA", createdCompany[1].Name);
+            Assert.Equal("NBA", createdCompany[0].Name);
+            Assert.Equal("NBL", createdCompany[1].Name);
+        }
+
+        [Fact]
+        public async Task Should_update_an_existed_company()
+        {
+            // given
+            var application = new WebApplicationFactory<Program>();
+            var httpClient = application.CreateClient();
+            /*
+             * Method: POST
+             * URI: /opi/addNewPet
+             * Body:
+             * {
+             *  "name: "Kitty",
+             *  "type":"cat",
+             *  "color":"white",
+             *  "price": 1000
+             * }
+             */
+            var company = new Company(name: "ABC");
+            var companyJSON = JsonConvert.SerializeObject(company);
+            var postBody = new StringContent(companyJSON, Encoding.UTF8, "application/json");
+            var response = await httpClient.PostAsync("/api/companys", postBody);
+            var responseBody = await response.Content.ReadAsStringAsync();
+            var createdCompany = JsonConvert.DeserializeObject<Company>(responseBody);
+            var id = createdCompany.CompanyID;
+            // when
+            company = new Company(name: "CBA", companyid: id);
+            companyJSON = JsonConvert.SerializeObject(company);
+            postBody = new StringContent(companyJSON, Encoding.UTF8, "application/json");
+            response = await httpClient.PutAsync("/api/companys/", postBody);
+
+            // then
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            responseBody = await response.Content.ReadAsStringAsync();
+            createdCompany = JsonConvert.DeserializeObject<Company>(responseBody);
+
+            Assert.Equal("CBA", createdCompany.Name);
+            Assert.NotEmpty(createdCompany.CompanyID);
         }
     }
 }

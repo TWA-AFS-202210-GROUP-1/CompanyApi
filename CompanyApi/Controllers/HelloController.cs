@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CompanyApi.Controllers
 {
@@ -18,8 +19,14 @@ namespace CompanyApi.Controllers
         }
 
         [HttpGet("companys")]
-        public ActionResult<List<Company>> GetAllCompanys()
+        public ActionResult<List<Company>> GetAllCompanys([FromQuery] int? size, [FromQuery] int? index)
         {
+            if (size != null && index != null)
+            {
+                return companys.Skip((index.Value - 1) * size.Value)
+                    .Take(size.Value).ToList();
+            }
+
             return companys;
         }
 
@@ -37,17 +44,19 @@ namespace CompanyApi.Controllers
             return NotFound();
         }
 
-        [HttpGet("companys/size/{size}/from/{index}")]
-        public ActionResult<List<Company>> GetCompanysInRange(string size, string index)
+        [HttpPut("companys")]
+        public ActionResult<Company> Updatecompany(Company company)
         {
-            List<Company> resultCompanys = new List<Company>();
-
-            for (int i = Convert.ToInt16(index); i < Convert.ToInt16(index) + Convert.ToInt16(size);  i++)
+            foreach (var existedcompany in companys)
             {
-                resultCompanys.Add(companys[i - 1]);
+                if (existedcompany.CompanyID == company.CompanyID)
+                {
+                    existedcompany.Name = company.Name;
+                    return company;
+                }
             }
 
-            return resultCompanys;
+            return NotFound();
         }
     }
 }

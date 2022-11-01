@@ -13,6 +13,12 @@ namespace CompanyApi.Controllers
             this.Name = name;
         }
 
+        public Company(string name, string companyid)
+        {
+            this.CompanyID = companyid;
+            this.Name = name;
+        }
+
         public Company()
         {
         }
