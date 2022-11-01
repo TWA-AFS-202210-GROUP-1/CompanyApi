@@ -91,5 +91,17 @@ namespace CompanyApi.Controllers
 
             return Created($"companies/{companyId}/employees/{newEmployee.Id}", newEmployee);
         }
+
+        [HttpGet("{companyId}/employees")]
+        public IActionResult AddEmployeeToCompany([FromRoute] string companyId)
+        {
+            var employees = _companyService.GetAllEmployeesInCompany(companyId);
+            if (employees == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(employees);
+        }
     }
 }

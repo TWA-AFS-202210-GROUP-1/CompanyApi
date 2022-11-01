@@ -159,12 +159,36 @@ namespace CompanyApiTest.Controllers
 
             var employeeResponse = await _httpClient.PostAsJsonAsync($"/companies/{companyId}/employees", employee);
             var employeeResponseString = await companyResponse.Content.ReadAsStringAsync();
-            var createdEmployee = JsonConvert.DeserializeObject<Company>(employeeResponseString);
+            var createdEmployee = JsonConvert.DeserializeObject<Employee>(employeeResponseString);
 
             // then
             employeeResponse.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.Created, employeeResponse.StatusCode);
             Assert.NotNull(createdEmployee.Id);
+        }
+
+        [Fact]
+        public async Task Should_get_all_employees_for_company_when_create_successfully_given_an_exist_company()
+        {
+            // given
+            var company = new Company("SLB");
+            var companyResponse = await _httpClient.PostAsJsonAsync("/companies", company);
+            var companyResponseString = await companyResponse.Content.ReadAsStringAsync();
+            var createdCompany = JsonConvert.DeserializeObject<Company>(companyResponseString);
+            var companyId = createdCompany.Id;
+            var employee = new Employee("Xu", 100);
+            await _httpClient.PostAsJsonAsync($"/companies/{companyId}/employees", employee);
+            // when
+
+            var allEmployeesResponse = await _httpClient.GetAsync($"/companies/{companyId}/employees");
+            var allEmployeesResponseString = await allEmployeesResponse.Content.ReadAsStringAsync();
+            var allEmployees = JsonConvert.DeserializeObject<IList<Employee>>(allEmployeesResponseString);
+
+            // then
+            allEmployeesResponse.EnsureSuccessStatusCode();
+            Assert.Equal(HttpStatusCode.OK, allEmployeesResponse.StatusCode);
+            Assert.Equal(1, allEmployees.Count);
+            Assert.Equal("Xu", allEmployees[0].Name);
         }
     }
 }

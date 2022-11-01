@@ -61,6 +61,13 @@ namespace CompanyApi.Services
             return employee;
         }
 
+        public IList<Employee>? GetAllEmployeesInCompany(string companyId)
+        {
+            var company = Companies.FirstOrDefault(_ => _.Id!.Equals(companyId));
+
+            return company?.Employees;
+        }
+
         public IList<Company> GetAllCompanies()
         {
             return Companies;
