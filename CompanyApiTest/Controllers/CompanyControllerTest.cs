@@ -111,7 +111,7 @@ namespace CompanyApiTest.Controllers
         }
 
         [Fact]
-        public async Task Should_return_copanies_successfully_given_page_size_and_index()
+        public async Task Should_return_companies_successfully_given_page_size_and_index()
         {
             // given
             Company company = new Company(name: "SLB");
@@ -156,6 +156,33 @@ namespace CompanyApiTest.Controllers
             var targetResponseBody = await targetResponse.Content.ReadAsStringAsync();
             var targetCompany = JsonConvert.DeserializeObject<Company>(targetResponseBody);
             Assert.Equal("slb", targetCompany.Name);
+        }
+
+        [Fact]
+        public async Task Should_return_added_employee_to_company_successfully()
+        {
+            // given
+            Company company = new Company(name: "SLB");
+            var application = new WebApplicationFactory<Program>();
+            var httpClient = application.CreateClient();
+            await httpClient.DeleteAsync("/companies");
+            var companyJson = JsonConvert.SerializeObject(company);
+            var postBody = new StringContent(companyJson, Encoding.UTF8, mediaType: "application/json");
+            var response = await httpClient.PostAsync("/companies", postBody);
+            var responseBody = await response.Content.ReadAsStringAsync();
+            var responseCompany = JsonConvert.DeserializeObject<Company>(responseBody);
+            Employee employee = new Employee(name: "Winnie");
+            var employeeJson = JsonConvert.SerializeObject(employee);
+            var employeePostBody = new StringContent(employeeJson, Encoding.UTF8, mediaType: "application/json");
+
+            // when
+            var targetResponse = await httpClient.PostAsync($"/companies/{responseCompany.CompanyID}/employees", employeePostBody);
+            // then
+            Assert.Equal(HttpStatusCode.OK, targetResponse.StatusCode);
+            var targetResponseBody = await targetResponse.Content.ReadAsStringAsync();
+            var targetEmployee = JsonConvert.DeserializeObject<Employee>(targetResponseBody);
+            Assert.Equal("Winnie", targetEmployee.Name);
+            //Assert.Equal(1, responseCompany.Employees.Count);
         }
     }
 }
