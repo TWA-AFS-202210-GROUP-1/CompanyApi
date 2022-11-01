@@ -9,10 +9,11 @@
         {
             this.Name = name;
             this.employeeID = string.Empty;
-            this.salary = salary;
+            this.Salary = Salary;
         }
 
         public string EmployeeID { get => employeeID; set => employeeID = value; }
         public string Name { get => name; set => name = value; }
+        public int Salary { get => salary; set => salary = value; }
     }
 }

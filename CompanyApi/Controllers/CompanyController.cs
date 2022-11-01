@@ -57,7 +57,7 @@ namespace CompanyApi.Controllers
             return Ok(company);
         }
 
-        [HttpPost("{companyID}")]
+        [HttpPut("{companyID}")]
         public ActionResult<Company> UpdateCompanyByID([FromRoute] string companyID, [FromBody] Company editedCompany)
         {
             Company company = companies.Find(x => x.CompanyID == companyID);
@@ -83,6 +83,16 @@ namespace CompanyApi.Controllers
         {
             Company company = companies.Find(x => x.CompanyID == companyID);
             return Ok(company.Employees);
+        }
+
+        [HttpPut("{companyID}/employees/{employeeID}")]
+        public ActionResult<List<Employee>> UpdateEmployeesOfCompany([FromRoute] string companyID, [FromBody] Employee employee)
+        {
+            Company company = companies.Find(x => x.CompanyID == companyID);
+            Employee targetEmployee = company.Employees.Find(x => x.EmployeeID == employee.EmployeeID);
+            employee.Salary = employee.Salary;
+            employee.Name = employee.Name;
+            return Ok(employee);
         }
     }
 }
