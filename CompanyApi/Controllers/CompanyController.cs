@@ -40,16 +40,9 @@ namespace CompanyApi.Controllers
             IList<Company> companies;
             if (pageSize != null && index != null)
             {
-                try
-                {
-                    companies = _companyService.GetCompaniesByPage(pageSize.Value, index.Value);
-                    return Ok(companies);
-                }
-                catch (Exception e)
-                {
-                    return BadRequest();
-                }
-            }
+                companies = _companyService.GetCompaniesByPage(pageSize.Value, index.Value);
+                return Ok(companies);
+            }   
 
             companies = _companyService.GetAllCompanies();
             return Ok(companies);
