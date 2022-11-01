@@ -76,5 +76,38 @@ namespace CompanyApi.Controllers
             Assert.Equal("ABC", createdCompany[0].Name);
             Assert.NotEmpty(createdCompany[0].CompanyID);
         }
+
+        [Fact]
+        public async Task Should_get_an_existed_company()
+        {
+            // given
+            var application = new WebApplicationFactory<Program>();
+            var httpClient = application.CreateClient();
+            /*
+             * Method: POST
+             * URI: /opi/addNewPet
+             * Body:
+             * {
+             *  "name: "Kitty",
+             *  "type":"cat",
+             *  "color":"white",
+             *  "price": 1000
+             * }
+             */
+            var company = new Company(name: "ABC");
+            var companyJSON = JsonConvert.SerializeObject(company);
+            var postBody = new StringContent(companyJSON, Encoding.UTF8, "application/json");
+            await httpClient.PostAsync("/api/companys", postBody);
+            // when
+            var response = await httpClient.GetAsync("/api/companys/ABC");
+
+            // then
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var responseBody = await response.Content.ReadAsStringAsync();
+            var createdCompany = JsonConvert.DeserializeObject<Company>(responseBody);
+
+            Assert.Equal("ABC", createdCompany.Name);
+            Assert.NotEmpty(createdCompany.CompanyID);
+        }
     }
 }
