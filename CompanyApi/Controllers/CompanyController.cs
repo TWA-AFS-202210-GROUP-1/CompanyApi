@@ -103,5 +103,19 @@ namespace CompanyApi.Controllers
                 return new NotFoundResult();
             }
         }
+
+        [HttpPatch("companies/{companyId}/employee/{employeeId}")]
+        public ActionResult<Employee> UpdateEmployeeInformationInOneCompany([FromRoute] string companyId, [FromRoute] string employeeId, [FromBody] Employee updateEmployee)
+        {
+            if (companiesList.Exists(x => x.CompanyId.Equals(companyId)) && companiesList.Find(x => x.CompanyId.Equals(companyId)).EmployeeList.Exists(e => e.EmployeeId.Equals(employeeId)))
+            {
+                companiesList.Find(x => x.CompanyId.Equals(companyId)).EmployeeList.Find(e => e.EmployeeId.Equals(employeeId)).Salary = updateEmployee.Salary;
+                return companiesList.Find(x => x.CompanyId.Equals(companyId)).EmployeeList.Find(e => e.EmployeeId.Equals(employeeId));
+            }
+            else
+            {
+                return new NotFoundResult();
+            }
+        }
     }
 }

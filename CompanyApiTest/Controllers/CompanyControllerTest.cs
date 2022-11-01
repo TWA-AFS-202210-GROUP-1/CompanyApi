@@ -279,6 +279,49 @@ namespace CompanyApiTest.Controllers
             fetchEmployeeList.ShouldDeepEqual(exceptedEmployeeList);
         }
 
+        [Fact]
+        public async void Should_update_employee_information_Given_new_employee_salary()
+        {
+            //given
+            var application = new WebApplicationFactory<Program>();
+            var httpClient = application.CreateClient();
+            _ = httpClient.DeleteAsync("/companies");
+
+            var companyNameList = new List<string>()
+            {
+                "Umbrella",
+                "Tencent",
+                "Sony",
+                "Nintendo",
+                "Valve",
+                "Rockstar",
+                "Electronic Arts",
+                "Activision Blizzard",
+                "Ubisoft",
+            };
+            List<Company> companyList = await AddMultiCompaniesToBackend(httpClient, companyNameList);
+            _ = httpClient.DeleteAsync("/companies/employee");
+
+            Employee newEmployee = new Employee("Ana", 10000);
+            List<Employee> exceptedEmployeeList = new List<Employee>() { newEmployee };
+            var newEmployeeJson = JsonConvert.SerializeObject(newEmployee);
+            var postBody = new StringContent(newEmployeeJson, Encoding.UTF8, "application/json");
+            await httpClient.PostAsync($"/companies/{companyList[0].CompanyId}/employee", postBody);
+
+            //when
+            Employee updateEmployee = new Employee("Ana", 15000);
+            var updateEmployeeJson = JsonConvert.SerializeObject(updateEmployee);
+            var updatePostBody = new StringContent(updateEmployeeJson, Encoding.UTF8, "application/json");
+
+            var response = await httpClient.PatchAsync($"/companies/{companyList[0].CompanyId}/employee/{newEmployee.EmployeeId}", updatePostBody);
+            // then
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var responseBody = await response.Content.ReadAsStringAsync();
+            var fetchEmployee = JsonConvert.DeserializeObject<Employee>(responseBody);
+            Assert.Equal(updateEmployee.Salary, fetchEmployee.Salary);
+
+        }
+
         private static async Task<List<Company>> AddMultiCompaniesToBackend(HttpClient httpClient, List<string> companyNameList)
         {
             List<Company> companyList = new List<Company>();
