@@ -161,6 +161,34 @@ namespace CompanyApiTest.Controllers
       Assert.Equal("Baidu", returnedCompany.Name);
     }
 
+    [Fact]
+    public async void Should_add_an_employee_to_a_specific_company()
+    {
+      // given
+      var httpClient = await InitializeHttpClient();
+      var companies = new List<Company>
+      {
+        new Company("SLB"),
+        new Company("TW"),
+      };
+      var employee = new Employee("Bob", 1000);
+      foreach (var company in companies)
+      {
+        await CreateTestSubject(httpClient, company);
+      }
+
+      var serializedObject = JsonConvert.SerializeObject(employee);
+      var postBody = new StringContent(serializedObject, Encoding.UTF8, "application/json");
+      var postResponse = await httpClient.PostAsync($"/companies/{companies[1].CompanyId}/Employees", postBody);
+      // when
+      var response = await httpClient.GetAsync($"/companies/{companies[1].CompanyId}");
+      // then
+      Assert.Equal(HttpStatusCode.Created, postResponse.StatusCode);
+      var responseBody = await response.Content.ReadAsStringAsync();
+      var returnedCompany = JsonConvert.DeserializeObject<Company>(responseBody);
+      Assert.Equal(employee, returnedCompany.Employees[0]);
+    }
+
     private static async Task<HttpClient> InitializeHttpClient()
     {
       var application = new WebApplicationFactory<Program>();

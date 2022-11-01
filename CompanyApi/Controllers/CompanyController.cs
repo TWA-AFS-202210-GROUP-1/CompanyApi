@@ -28,6 +28,15 @@ namespace CompanyApi.Controllers
       }
     }
 
+    [HttpPost("{companyId}/Employees")]
+    public IActionResult AddNewEmployee([FromRoute] string companyId, Employee employee)
+    {
+      var targetCompany = companies.First(company => company.CompanyId.Equals(companyId));
+      targetCompany.Employees.Add(employee);
+
+      return Created($"/companies/{targetCompany.CompanyId}/Employees", targetCompany);
+    }
+
     [HttpGet]
     public IActionResult GetCompanies([FromQuery] int? pageSize, [FromQuery] int? pageIndex)
     {
