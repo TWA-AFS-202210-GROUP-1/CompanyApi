@@ -351,8 +351,45 @@ namespace CompanyApiTest.Controllers
             await httpClient.PostAsync($"/companies/{companyList[0].CompanyId}/employee", postBody);
 
             //when
-            await httpClient.DeleteAsync($"/companies/{companyList[0].CompanyId}/employee/{newEmployee.EmployeeId}");
-            var response = await httpClient.GetAsync($"/companies/{companyList[0].CompanyId}/employee/{newEmployee.EmployeeId}");
+            await httpClient.DeleteAsync($"/companies/{companyList[0].CompanyId}");
+            var response = await httpClient.GetAsync($"/companies/{companyList[0].CompanyId}");
+
+            // then
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Fact]
+        public async void Should_delete_one_one_company_and_clear_employee_list_in_this_company()
+        {
+            //given
+            var application = new WebApplicationFactory<Program>();
+            var httpClient = application.CreateClient();
+            _ = httpClient.DeleteAsync("/companies");
+
+            var companyNameList = new List<string>()
+            {
+                "Umbrella",
+                "Tencent",
+                "Sony",
+                "Nintendo",
+                "Valve",
+                "Rockstar",
+                "Electronic Arts",
+                "Activision Blizzard",
+                "Ubisoft",
+            };
+            List<Company> companyList = await AddMultiCompaniesToBackend(httpClient, companyNameList);
+            _ = httpClient.DeleteAsync("/companies/employee");
+
+            Employee newEmployee = new Employee("Ana", 10000);
+            List<Employee> exceptedEmployeeList = new List<Employee>() { newEmployee };
+            var newEmployeeJson = JsonConvert.SerializeObject(newEmployee);
+            var postBody = new StringContent(newEmployeeJson, Encoding.UTF8, "application/json");
+            await httpClient.PostAsync($"/companies/{companyList[0].CompanyId}/employee", postBody);
+
+            //when
+            await httpClient.DeleteAsync($"/companies/{companyList[0].CompanyId}");
+            var response = await httpClient.GetAsync($"/companies/{companyList[0].CompanyId}");
 
             // then
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
