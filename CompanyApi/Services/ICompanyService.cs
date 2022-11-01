@@ -9,4 +9,5 @@ public interface ICompanyService
     public IList<Company> GetAllCompanies();
     public Company? GetCompanyById(string id);
     public void DeleteAllCompany();
+    public IList<Company> GetCompaniesByPage(int pageSize, int index);
 }

@@ -32,6 +32,11 @@ namespace CompanyApi.Services
             Companies.Clear();
         }
 
+        public IList<Company> GetCompaniesByPage(int pageSize, int index)
+        { 
+            return Companies.Skip((pageSize - 1) * pageSize).Take(pageSize).ToList();
+        }
+
         public IList<Company> GetAllCompanies()
         {
             return Companies;

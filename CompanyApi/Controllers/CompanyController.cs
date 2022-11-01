@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using CompanyApi.Models;
 using CompanyApi.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -28,9 +30,28 @@ namespace CompanyApi.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAllCompanies()
+        public IActionResult GetAllCompanies([FromQuery] int? pageSize, [FromQuery] int? index)
         {
-            var companies = _companyService.GetAllCompanies();
+            if (pageSize == null ^ index == null)
+            {
+                return BadRequest();
+            }
+
+            IList<Company> companies;
+            if (pageSize != null && index != null)
+            {
+                try
+                {
+                    companies = _companyService.GetCompaniesByPage(pageSize.Value, index.Value);
+                    return Ok(companies);
+                }
+                catch (Exception e)
+                {
+                    return BadRequest();
+                }
+            }
+
+            companies = _companyService.GetAllCompanies();
             return Ok(companies);
         }
 

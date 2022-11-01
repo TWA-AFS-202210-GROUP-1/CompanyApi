@@ -92,5 +92,33 @@ namespace CompanyApiTest.Controllers
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Equal("SLB", slb.Name);
         }
+        [Fact]
+        public async Task Should_return_ok_when_get_an_2_company_given_page_size_and_index_from()
+        {
+            // given
+            var companies = new List<Company>()
+            {
+                new Company("SLB"),
+                new Company("TW"),
+                new Company("Facebook"),
+                new Company("Google"),
+                new Company("Microsoft"),
+            };
+            foreach (var company in companies)
+            {
+                await _httpClient.PostAsJsonAsync("/companies", company);
+            }
+
+            // when
+            var response = await _httpClient.GetAsync("/companies?pageSize=2&index=2");
+            var responseString = await response.Content.ReadAsStringAsync();
+
+            var companiesResponse = JsonConvert.DeserializeObject<IList<Company>>(responseString);
+
+            // then
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(2, companiesResponse.Count);
+            Assert.Equal("Facebook", companiesResponse[0].Name);
+        }
     }
 }
