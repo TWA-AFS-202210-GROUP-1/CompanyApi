@@ -60,7 +60,7 @@ namespace CompanyApi.Controllers
         }
 
         [HttpPost("companys/{companyid}/employees")]
-        public ActionResult<string> AddNewEmployeetoCompany([FromRoute] string companyid, Employee employee)
+        public ActionResult<Employee> AddNewEmployeetoCompany([FromRoute] string companyid, Employee employee)
         {
             employee.EmployeeID = Guid.NewGuid().ToString();
             foreach (var company in companys)
@@ -70,6 +70,20 @@ namespace CompanyApi.Controllers
                company.AddEmployee(employee);
                return new CreatedResult("/companies/{companyid}/employees/{employee.EmployeeID}", employee);
             }
+            }
+
+            return NotFound();
+        }
+
+        [HttpGet("companys/{companyid}/employees")]
+        public ActionResult<List<Employee>> GetAllEmployeefromCompany([FromRoute] string companyid)
+        {
+            foreach (var company in companys)
+            {
+                if (companyid == company.CompanyID)
+                {
+                    return company.Employees;
+                }
             }
 
             return NotFound();
