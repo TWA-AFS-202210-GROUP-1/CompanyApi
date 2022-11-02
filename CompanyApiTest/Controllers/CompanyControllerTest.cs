@@ -35,7 +35,7 @@ namespace CompanyApiTest.Controllers
             await httpClient.DeleteAsync("/companies");
             var company = new Company(name: "SLB");
 
-            var postBody = SerializeCompanyToStringContent(company);
+            var postBody = SerializeToStringContent(company);
 
             // when
             var response = await httpClient.PostAsync("/companies", postBody);
@@ -43,7 +43,7 @@ namespace CompanyApiTest.Controllers
             // then
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
-            var createdCompany = await DeserializeObjectToCompany(response);
+            var createdCompany = await DeserializeObject<Company>(response);
             Assert.Equal("SLB", createdCompany.Name);
             Assert.NotNull(createdCompany.CompanyId);
         }
@@ -57,7 +57,7 @@ namespace CompanyApiTest.Controllers
             await httpClient.DeleteAsync("/companies");
             var company = new Company(name: "SLB");
 
-            var postBody = SerializeCompanyToStringContent(company);
+            var postBody = SerializeToStringContent(company);
             await httpClient.PostAsync("/companies", postBody);
 
             // when
@@ -81,7 +81,7 @@ namespace CompanyApiTest.Controllers
 
             foreach (var company in companyList)
             {
-                var postBody = SerializeCompanyToStringContent(company);
+                var postBody = SerializeToStringContent(company);
                 await httpClient.PostAsync("/companies", postBody);
             }
 
@@ -90,7 +90,7 @@ namespace CompanyApiTest.Controllers
 
             // then
             responseList.EnsureSuccessStatusCode();
-            var allCompanies = DeserializeObjectToCompanyList(responseList).Result;
+            var allCompanies = DeserializeObject<List<Company>>(responseList).Result;
             Assert.Equal(companyList, allCompanies);
             Assert.Equal(HttpStatusCode.OK, responseList.StatusCode);
         }
@@ -103,17 +103,17 @@ namespace CompanyApiTest.Controllers
             await httpClient.DeleteAsync("/companies");
             var company = new Company(name: "SLB");
 
-            var postBody = SerializeCompanyToStringContent(company);
+            var postBody = SerializeToStringContent(company);
             var addCompany = await httpClient.PostAsync("/companies", postBody);
 
-            var companyId = DeserializeObjectToCompany(addCompany).Result.CompanyId;
+            var companyId = DeserializeObject<Company>(addCompany).Result.CompanyId;
 
             //when
             var response = await httpClient.GetAsync($"companies/{companyId}");
 
             // then
             response.EnsureSuccessStatusCode();
-            var getCompany = DeserializeObjectToCompany(response).Result;
+            var getCompany = DeserializeObject<Company>(response).Result;
             Assert.Equal(company.Name, getCompany.Name);
         }
 
@@ -125,7 +125,7 @@ namespace CompanyApiTest.Controllers
             await httpClient.DeleteAsync("/companies");
             var company = new Company(name: "SLB");
 
-            var postBody = SerializeCompanyToStringContent(company);
+            var postBody = SerializeToStringContent(company);
             await httpClient.PostAsync("/companies", postBody);
 
             //when
@@ -151,7 +151,7 @@ namespace CompanyApiTest.Controllers
 
             foreach (var company in companyList)
             {
-                var postBody = SerializeCompanyToStringContent(company);
+                var postBody = SerializeToStringContent(company);
                 await httpClient.PostAsync("/companies", postBody);
             }
 
@@ -165,7 +165,7 @@ namespace CompanyApiTest.Controllers
                 new Company(name: "MICROSOFT"),
             };
             responseList.EnsureSuccessStatusCode();
-            var allCompanies = DeserializeObjectToCompanyList(responseList).Result;
+            var allCompanies = DeserializeObject<List<Company>>(responseList).Result;
             Assert.Equal(getCompanies, allCompanies);
             Assert.Equal(HttpStatusCode.OK, responseList.StatusCode);
         }
@@ -178,12 +178,12 @@ namespace CompanyApiTest.Controllers
             await httpClient.DeleteAsync("/companies");
 
             var company = new Company(name: "SLB");
-            var postBody = SerializeCompanyToStringContent(company);
+            var postBody = SerializeToStringContent(company);
             var response = await httpClient.PostAsync("/companies", postBody);
-            var originCompany = DeserializeObjectToCompany(response).Result;
+            var originCompany = DeserializeObject<Company>(response).Result;
 
             company.Name = "slb";
-            var modifyPostBody = SerializeCompanyToStringContent(company);
+            var modifyPostBody = SerializeToStringContent(company);
 
             //when
             var companyId = originCompany.CompanyId;
@@ -191,7 +191,7 @@ namespace CompanyApiTest.Controllers
 
             // then
             modifyResponse.EnsureSuccessStatusCode();
-            var resultCompany = DeserializeObjectToCompany(modifyResponse).Result;
+            var resultCompany = DeserializeObject<Company>(modifyResponse).Result;
             Assert.Equal(company, resultCompany);
             Assert.Equal(HttpStatusCode.OK, modifyResponse.StatusCode);
         }
@@ -204,7 +204,7 @@ namespace CompanyApiTest.Controllers
             await httpClient.DeleteAsync("/companies");
 
             var company = new Company(name: "SLB");
-            var postBody = SerializeCompanyToStringContent(company);
+            var postBody = SerializeToStringContent(company);
             await httpClient.PostAsync("/companies", postBody);
 
             //when
@@ -223,23 +223,23 @@ namespace CompanyApiTest.Controllers
             await httpClient.DeleteAsync("/companies");
 
             var company = new Company(name: "SLB");
-            var response = await httpClient.PostAsync("/companies", SerializeCompanyToStringContent(company));
-            var companyId = DeserializeObjectToCompany(response).Result.CompanyId;
+            var response = await httpClient.PostAsync("/companies", SerializeToStringContent(company));
+            var companyId = DeserializeObject<Company>(response).Result.CompanyId;
 
             var employee = new List<Employee>() { new Employee(name: "YZJ", salary: 10), };
-            var employeePostBody = SerializeEmployeeListToStringContent(employee);
+            var employeePostBody = SerializeToStringContent(employee);
 
             //when
-            var addEmployeeResponse = await httpClient.PostAsync($"/companies/{companyId}", employeePostBody);
+            var addEmployeeResponse = await httpClient.PostAsync($"/companies/{companyId}/employees", employeePostBody);
 
             // then
             addEmployeeResponse.EnsureSuccessStatusCode();
-            var addEmployee = DeserializeObjectToEmployeeList(addEmployeeResponse).Result;
+            var addEmployee = DeserializeObject<List<Employee>>(addEmployeeResponse).Result;
             Assert.Equal(HttpStatusCode.OK, addEmployeeResponse.StatusCode);
             Assert.Equal(employee, addEmployee);
 
             var modifyCompanyMessage = await httpClient.GetAsync($"companies/{companyId}");
-            var modifyCompany = DeserializeObjectToCompany(modifyCompanyMessage).Result;
+            var modifyCompany = DeserializeObject<Company>(modifyCompanyMessage).Result;
 
             Assert.Single(modifyCompany.Employee);
             Assert.Equal(addEmployee, modifyCompany.Employee);
@@ -253,8 +253,8 @@ namespace CompanyApiTest.Controllers
             await httpClient.DeleteAsync("/companies");
 
             var company = new Company(name: "SLB");
-            var response = await httpClient.PostAsync("/companies", SerializeCompanyToStringContent(company));
-            var companyId = DeserializeObjectToCompany(response).Result.CompanyId;
+            var response = await httpClient.PostAsync("/companies", SerializeToStringContent(company));
+            var companyId = DeserializeObject<Company>(response).Result.CompanyId;
 
             var employeeList = new List<Employee>()
             {
@@ -262,8 +262,8 @@ namespace CompanyApiTest.Controllers
                 new Employee(name: "LJ", salary: 11),
                 new Employee(name: "LWR", salary: 12),
             };
-            var employeePostBody = SerializeEmployeeListToStringContent(employeeList);
-            await httpClient.PostAsync($"/companies/{companyId}", employeePostBody);
+            var employeePostBody = SerializeToStringContent(employeeList);
+            await httpClient.PostAsync($"/companies/{companyId}/employees", employeePostBody);
 
             //when
             var addEmployeeListResponse = await httpClient.GetAsync($"/companies/{companyId}/employees");
@@ -271,12 +271,12 @@ namespace CompanyApiTest.Controllers
             // then
             addEmployeeListResponse.EnsureSuccessStatusCode();
 
-            var addEmployeeList = DeserializeObjectToEmployeeList(addEmployeeListResponse).Result;
+            var addEmployeeList = DeserializeObject<List<Employee>>(addEmployeeListResponse).Result;
             Assert.Equal(HttpStatusCode.OK, addEmployeeListResponse.StatusCode);
             Assert.Equal(employeeList, addEmployeeList);
 
             var modifyCompanyMessage = await httpClient.GetAsync($"companies/{companyId}");
-            var modifyCompany = DeserializeObjectToCompany(modifyCompanyMessage).Result;
+            var modifyCompany = DeserializeObject<Company>(modifyCompanyMessage).Result;
 
             Assert.Equal(employeeList, modifyCompany.Employee);
         }
@@ -289,8 +289,8 @@ namespace CompanyApiTest.Controllers
             await httpClient.DeleteAsync("/companies");
 
             var company = new Company(name: "SLB");
-            var response = await httpClient.PostAsync("/companies", SerializeCompanyToStringContent(company));
-            var companyId = DeserializeObjectToCompany(response).Result.CompanyId;
+            var response = await httpClient.PostAsync("/companies", SerializeToStringContent(company));
+            var companyId = DeserializeObject<Company>(response).Result.CompanyId;
 
             var employeeList = new List<Employee>()
             {
@@ -298,25 +298,25 @@ namespace CompanyApiTest.Controllers
                 new Employee(name: "LJ", salary: 11),
                 new Employee(name: "LWR", salary: 12),
             };
-            var employeePostBody = SerializeEmployeeListToStringContent(employeeList);
-            await httpClient.PostAsync($"/companies/{companyId}", employeePostBody);
+            var employeePostBody = SerializeToStringContent(employeeList);
+            await httpClient.PostAsync($"/companies/{companyId}/employees", employeePostBody);
 
             var allEmployeeResponse = await httpClient.GetAsync($"/companies/{companyId}/employees");
-            var employees = DeserializeObjectToEmployeeList(allEmployeeResponse).Result;
+            var employees = DeserializeObject<List<Employee>>(allEmployeeResponse).Result;
 
             employees[0].Name = "OutMan";
             employees[0].Salary = 5;
 
-            var modifyEmployee = SerializeEmployeeToStringContent(employees[0]);
+            var modifyEmployee = SerializeToStringContent(employees[0]);
             var modifyEmployeeMessage = httpClient.PatchAsync(
                 $"/companies/{companyId}/employees/{employees[0].EmployeeId}", modifyEmployee).Result;
 
-            var deserializeObjectToEmployee = DeserializeObjectToEmployee(modifyEmployeeMessage).Result;
+            var deserializeObjectToEmployee = DeserializeObject<Employee>(modifyEmployeeMessage).Result;
 
             Assert.Equal(employees[0], deserializeObjectToEmployee);
 
             var modifyCompanyMessage = await httpClient.GetAsync($"companies/{companyId}");
-            var modifyCompany = DeserializeObjectToCompany(modifyCompanyMessage).Result;
+            var modifyCompany = DeserializeObject<Company>(modifyCompanyMessage).Result;
 
             Assert.Equal(employees[0], modifyCompany.Employee[0]);
         }
@@ -329,8 +329,8 @@ namespace CompanyApiTest.Controllers
             await httpClient.DeleteAsync("/companies");
 
             var company = new Company(name: "SLB");
-            var response = await httpClient.PostAsync("/companies", SerializeCompanyToStringContent(company));
-            var companyId = DeserializeObjectToCompany(response).Result.CompanyId;
+            var response = await httpClient.PostAsync("/companies", SerializeToStringContent(company));
+            var companyId = DeserializeObject<Company>(response).Result.CompanyId;
 
             var employeeList = new List<Employee>()
             {
@@ -338,17 +338,17 @@ namespace CompanyApiTest.Controllers
                 new Employee(name: "LJ", salary: 11),
                 new Employee(name: "LWR", salary: 12),
             };
-            var employeePostBody = SerializeEmployeeListToStringContent(employeeList);
-            await httpClient.PostAsync($"/companies/{companyId}", employeePostBody);
+            var employeePostBody = SerializeToStringContent(employeeList);
+            await httpClient.PostAsync($"/companies/{companyId}/employees", employeePostBody);
 
             var allEmployeeResponse = await httpClient.GetAsync($"/companies/{companyId}/employees");
-            var employees = DeserializeObjectToEmployeeList(allEmployeeResponse).Result;
+            var employees = DeserializeObject<List<Employee>>(allEmployeeResponse).Result;
 
-            var modifyEmployee = SerializeEmployeeToStringContent(employees[0]);
+            var modifyEmployee = SerializeToStringContent(employees[0]);
             var deleteEmployeeMessage = httpClient.DeleteAsync(
                 $"/companies/{companyId}/employees/{employees[0].EmployeeId}").Result;
 
-            var deserializeObjectToEmployee = DeserializeObjectToEmployee(deleteEmployeeMessage).Result;
+            var deserializeObjectToEmployee = DeserializeObject<Employee>(deleteEmployeeMessage).Result;
 
             Assert.Equal(employees[0], deserializeObjectToEmployee);
         }
@@ -361,8 +361,8 @@ namespace CompanyApiTest.Controllers
             await httpClient.DeleteAsync("/companies");
 
             var company = new Company(name: "SLB");
-            var companyResponse = await httpClient.PostAsync("/companies", SerializeCompanyToStringContent(company));
-            var companyId = DeserializeObjectToCompany(companyResponse).Result.CompanyId;
+            var companyResponse = await httpClient.PostAsync("/companies", SerializeToStringContent(company));
+            var companyId = DeserializeObject<Company>(companyResponse).Result.CompanyId;
 
             var employeeList = new List<Employee>()
             {
@@ -370,7 +370,7 @@ namespace CompanyApiTest.Controllers
                 new Employee(name: "LJ", salary: 11),
                 new Employee(name: "LWR", salary: 12),
             };
-            var employeePostBody = SerializeEmployeeListToStringContent(employeeList);
+            var employeePostBody = SerializeToStringContent(employeeList);
             await httpClient.PostAsync($"/companies/{companyId}", employeePostBody);
 
             //when
@@ -378,57 +378,22 @@ namespace CompanyApiTest.Controllers
 
             // then
             response.EnsureSuccessStatusCode();
-            var getCompany = DeserializeObjectToCompany(response).Result;
+            var getCompany = DeserializeObject<Company>(response).Result;
             Assert.Equal(company, getCompany);
         }
 
-        private static StringContent SerializeCompanyToStringContent(Company company)
+        private static StringContent SerializeToStringContent<T>(T input)
         {
-            var companyJson = JsonConvert.SerializeObject(company);
-            var postBody = new StringContent(companyJson, Encoding.UTF8, "application/json");
+            var inputJson = JsonConvert.SerializeObject(input);
+            var postBody = new StringContent(inputJson, Encoding.UTF8, "application/json");
             return postBody;
         }
 
-        private static async Task<Company> DeserializeObjectToCompany(HttpResponseMessage response)
+        private static async Task<T?> DeserializeObject<T>(HttpResponseMessage response)
         {
             var responseBody = await response.Content.ReadAsStringAsync();
-            var company = JsonConvert.DeserializeObject<Company>(responseBody);
-            return company;
-        }
-
-        private static async Task<List<Company>> DeserializeObjectToCompanyList(HttpResponseMessage response)
-        {
-            var responseBody = await response.Content.ReadAsStringAsync();
-            var company = JsonConvert.DeserializeObject<List<Company>>(responseBody);
-            return company;
-        }
-
-        private static StringContent SerializeEmployeeToStringContent(Employee employee)
-        {
-            var employeeJson = JsonConvert.SerializeObject(employee);
-            var postBody = new StringContent(employeeJson, Encoding.UTF8, "application/json");
-            return postBody;
-        }
-
-        private static StringContent SerializeEmployeeListToStringContent(List<Employee> employee)
-        {
-            var employeeJson = JsonConvert.SerializeObject(employee);
-            var postBody = new StringContent(employeeJson, Encoding.UTF8, "application/json");
-            return postBody;
-        }
-
-        private static async Task<Employee> DeserializeObjectToEmployee(HttpResponseMessage response)
-        {
-            var responseBody = await response.Content.ReadAsStringAsync();
-            var employee = JsonConvert.DeserializeObject<Employee>(responseBody);
-            return employee;
-        }
-
-        private static async Task<List<Employee>> DeserializeObjectToEmployeeList(HttpResponseMessage response)
-        {
-            var responseBody = await response.Content.ReadAsStringAsync();
-            var employeeList = JsonConvert.DeserializeObject<List<Employee>>(responseBody);
-            return employeeList;
+            var deserializeObject = JsonConvert.DeserializeObject<T>(responseBody);
+            return deserializeObject;
         }
     }
 }

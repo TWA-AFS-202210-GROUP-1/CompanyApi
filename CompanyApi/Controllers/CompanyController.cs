@@ -73,7 +73,7 @@ namespace CompanyApi.Controllers
             return NotFound();
         }
 
-        [HttpPost("{companyId}")]
+        [HttpPost("{companyId}/employees")]
         public ActionResult<List<Employee>> AddAnEmployeeToSpecificCompany(string companyId, List<Employee> employee)
         {
             foreach (var company in companies.Where(company => company.CompanyId == companyId))
