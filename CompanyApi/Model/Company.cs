@@ -18,6 +18,5 @@ namespace CompanyApi.Model
         public string CompanyID { get => companyID; set => companyID = value; }
         public string Name { get => name; set => name = value; }
         public List<Employee> Employees { get => employees; set => employees = value; }
-
     }
 }
